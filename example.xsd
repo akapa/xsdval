@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" targetNamespace="http://budget.kapa.org/" xmlns:tns="http://budget.kapa.org/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:element name="deleteObjects" nillable="true" type="tns:deleteObjects"/>
+
+  <xs:element name="getAmount" nillable="true" type="tns:getAmount"/>
+
+  <xs:element name="getAmountResponse" nillable="true" type="tns:getAmountResponse"/>
+
+  <xs:element name="getEventsInRange" nillable="true" type="tns:getEventsInRange"/>
+
+  <xs:element name="getEventsInRangeResponse" nillable="true" type="tns:getEventsInRangeResponse"/>
+
+  <xs:element name="getRecentEvents" nillable="true" type="tns:getRecentEvents"/>
+
+  <xs:element name="getRecentEventsResponse" nillable="true" type="tns:getRecentEventsResponse"/>
+
+  <xs:element name="storeObjects" nillable="true" type="tns:storeObjects"/>
+
+  <xs:simpleType name="pos">
+    <xs:restriction base="xs:int">
+      <xs:minExclusive value="20"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="id">
+    <xs:restriction base="tns:pos">
+      <xs:maxExclusive value="100"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="getRecentEvents">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="getRecentEventsResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:event" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="event">
+    <xs:complexContent>
+      <xs:extension base="tns:basic">
+        <xs:sequence>
+          <xs:element name="amount" type="xs:float"/>
+          <xs:element name="description" type="xs:string" minOccurs="0"/>
+          <xs:element name="id" type="tns:id" minOccurs="0"/>
+          <xs:element name="time" type="xs:dateTime" minOccurs="0"/>
+          <xs:element name="type" type="xs:string" minOccurs="0"/>
+          <xs:element name="user" type="tns:user" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="verybasic" abstract="true">
+    <xs:sequence>
+      <xs:element name="stuff" type="xs:string" minOccurs="1"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="basic" abstract="true">
+    <xs:complexContent>
+      <xs:extension base="tns:verybasic">
+        <xs:sequence>
+          <xs:element name="additional" type="xs:string" minOccurs="1"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="user">
+    <xs:complexContent>
+      <xs:extension base="tns:basic">
+        <xs:sequence>
+          <xs:element name="events" type="tns:event" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+          <xs:element name="id" type="tns:id" minOccurs="0"/>
+          <xs:element name="name" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="getEventsInRange">
+    <xs:sequence>
+      <xs:element name="timeFrom" type="xs:dateTime" minOccurs="0"/>
+      <xs:element name="timeTo" type="xs:dateTime" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getEventsInRangeResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:event" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="storeObjects">
+    <xs:sequence>
+      <xs:element name="objects" type="tns:basic" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getAmount">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="getAmountResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="deleteObjects">
+    <xs:sequence>
+      <xs:element name="objects" type="tns:basic" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
+

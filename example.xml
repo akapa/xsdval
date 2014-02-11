@@ -1,0 +1,21 @@
+<my:getEventsInRangeResponse xmlns:my="http://budget.kapa.org/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="my:getEventsInRangeResponse">
+  <return xsi:type="my:event">
+    <amount>1.05e+1</amount>
+    <description>This is a test</description>
+    <id>56</id>
+    <time>1996-08-31T10:55:00.000Z</time>
+    <type>income</type>
+    <user xsi:type="my:user">
+      <id>11</id>
+      <name>Gipsz Jakab</name>
+    </user>
+  </return>
+  <return xsi:type="my:event">
+    <amount>2.911e+1</amount>
+    <description>Another one</description>
+    <id>101</id>
+    <time>1986-05-15T20:00:00.000Z</time>
+    <type>income</type>
+    <user xsi:nil="true"/>
+  </return>
+</my:getEventsInRangeResponse>
