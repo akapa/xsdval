@@ -5,7 +5,8 @@ requirejs.config({
         'text': 'lib/text',
         'Xml': 'lib/Xml',
         'Library': 'lib/Library',
-        'objTools': 'lib/objTools'
+        'objTools': 'lib/objTools',
+        'xsdvalidator': '../dist/xsdvalidator'
     },
 	shim: {
 		'underscore': {
@@ -14,7 +15,7 @@ requirejs.config({
 	}
 });
 
-requirejs(['underscore', 'Xml', 'xsdval/XmlValidator'],
+requirejs(['underscore', 'Xml', 'xsdvalidator'],
 function (_, Xml, XmlValidator) {
 
 	var doValidate = function () {

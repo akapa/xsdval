@@ -1,5 +1,5 @@
-define(['underscore', 'objTools', 'Xml', 'xsdval/XsdLibrary', 'xsdval/NodeValidatorFactory'],
-function (_, objTools, Xml, XsdLibrary, NodeValidatorFactory) {
+define(['objTools', 'xsdval/XsdLibrary', 'xsdval/NodeValidatorFactory'],
+function (objTools, XsdLibrary, NodeValidatorFactory) {
 	var xmlValidator = {
 		init: function () {
 			this.xsdLibrary = new XsdLibrary();
