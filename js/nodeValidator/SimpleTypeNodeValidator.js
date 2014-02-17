@@ -1,6 +1,6 @@
-define(['underscore', 'objTools', 'xsdval/nodeValidator/NodeValidator',
+define(['underscore', 'objTools', 'xsd', 'xsdval/nodeValidator/NodeValidator',
 	'xsdval/primitiveUnserializers', 'xsdval/XmlValidationResult', 'xsdval/XmlValidationError'],
-function (_, objTools, NodeValidator, primitiveUnserializers,
+function (_, objTools, xsd, NodeValidator, primitiveUnserializers,
 	XmlValidationResult, XmlValidationError) {
 	
 	var simpleTypeNodeValidator = objTools.make(NodeValidator, {
@@ -23,7 +23,7 @@ function (_, objTools, NodeValidator, primitiveUnserializers,
 			return new XmlValidationResult(errors);
 		},
 		getValue: function () {
-			return Xml.getNodeText(this.node);
+			return xsd.getNodeText(this.node);
 		},
 		getRealValue: function (type, value) {
 			var v = value || this.getValue();

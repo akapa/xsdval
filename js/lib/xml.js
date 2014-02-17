@@ -1,7 +1,6 @@
 define(function () {
-	var Xml = {
-		xs: 'http://www.w3.org/2001/XMLSchema',
-		xsi: 'http://www.w3.org/2001/XMLSchema-instance',
+
+	var xml = {
 		makeAttribute: function (key, value) {
 			return [' ', key, '="', value, '"'].join('');
 		},
@@ -105,5 +104,7 @@ define(function () {
 		    return formatted;
 		}
 	};
-	return Xml;
+
+	return xml;
+
 });

@@ -17,7 +17,7 @@ requirejs.config({
 });
 
 requirejs(['underscore', 'xsd', 'xsdvalidator'],
-function (_, xsd, XmlValidator) {
+function (_, xml, XmlValidator) {
 
 	var doValidate = function () {
 		var xsd = xml.parseXml(document.getElementById('xsd').value);

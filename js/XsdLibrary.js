@@ -4,8 +4,7 @@ function (_, objTools, Library, xsd, basetypesXsd) {
 	var xsdLibrary = objTools.make(Library, {
 		init: function (defs) {
 			defs = defs || [];
-			var xsd = xsd.parseXml(basetypesXsd);
-			(new Library).init.call(this, defs.concat([xsd]));
+			(new Library).init.call(this, defs.concat([xsd.parseXml(basetypesXsd)]));
 			return this;
 		},
 		addItem: function (def, name) {
