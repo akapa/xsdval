@@ -1,13 +1,13 @@
-define(['underscore', 'objTools', 'Xml', 'xsdval/nodeValidator/NodeValidator',
+define(['underscore', 'objTools', 'xsd', 'xsdval/nodeValidator/NodeValidator',
 	'xsdval/XmlValidationResult', 'xsdval/XmlValidationError'],
-function (_, objTools, Xml, NodeValidator, XmlValidationResult, XmlValidationError) {
+function (_, objTools, xsd, NodeValidator, XmlValidationResult, XmlValidationError) {
 	
 	var anySimpleTypeNodeValidator = objTools.make(NodeValidator, {
 		type: 'anySimpleType',
 		validate: function () {
-			var type = this.xsdLibrary.getTypeFromNodeAttr(this.node, 'type', Xml.xsi);
+			var type = this.xsdLibrary.getTypeFromNodeAttr(this.node, 'type', xsd.xsi);
 			var xsdNode = this.xsdLibrary.findTypeDefinition(type.namespaceURI, type.name);
-			if (xsdNode.namespaceURI === Xml.xs && xsdNode.localName === 'complexType') {
+			if (xsdNode.namespaceURI === xsd.xs && xsdNode.localName === 'complexType') {
 				return new XmlValidationResult([
 					new XmlValidationError(this.node, this.definition, 'simpleType')
 				]);

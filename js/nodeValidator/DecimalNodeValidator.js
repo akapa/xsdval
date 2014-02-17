@@ -1,6 +1,6 @@
-define(['underscore', 'objTools', 'Xml', 'xsdval/nodeValidator/SimpleTypeNodeValidator',
+define(['underscore', 'objTools', 'xsdval/nodeValidator/SimpleTypeNodeValidator',
 	'xsdval/XmlValidationResult', 'xsdval/XmlValidationError'],
-function (_, objTools, Xml, SimpleTypeNodeValidator, XmlValidationResult, XmlValidationError) {
+function (_, objTools, SimpleTypeNodeValidator, XmlValidationResult, XmlValidationError) {
 	
 	var decimalNodeValidator = objTools.make(SimpleTypeNodeValidator, {
 		type: 'decimal',

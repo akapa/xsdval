@@ -1,5 +1,5 @@
-define(['underscore', 'objTools', 'Xml', 'xsdval/XmlValidationResult'],
-function (_, objTools, Xml, XmlValidationResult) {
+define(['underscore', 'objTools', 'xsdval/XmlValidationResult'],
+function (_, objTools, XmlValidationResult) {
 	var nodeValidator = {
 		init: function (node, definition, validatorFactory) {
 			this.node = node;

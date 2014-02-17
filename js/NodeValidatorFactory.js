@@ -1,4 +1,4 @@
-define(['underscore', 'objTools', 'Xml', 
+define(['underscore', 'objTools', 'xsd', 
 	'xsdval/nodeValidator/NodeValidator',
 	'xsdval/nodeValidator/ComplexTypeNodeValidator', 
 	'xsdval/nodeValidator/AnyTypeNodeValidator',
@@ -8,7 +8,7 @@ define(['underscore', 'objTools', 'Xml',
 	'xsdval/nodeValidator/BooleanNodeValidator',
 	'xsdval/nodeValidator/DateTimeNodeValidator', 
 	'xsdval/nodeValidator/StringNodeValidator'],
-function (_, objTools, Xml, NodeValidator, ComplexTypeNodeValidator, AnyTypeNodeValidator,
+function (_, objTools, xsd, NodeValidator, ComplexTypeNodeValidator, AnyTypeNodeValidator,
 	AnySimpleTypeNodeValidator, FloatNodeValidator, DecimalNodeValidator, 
 	BooleanNodeValidator, DateTimeNodeValidator, StringNodeValidator) {
 
@@ -26,19 +26,19 @@ function (_, objTools, Xml, NodeValidator, ComplexTypeNodeValidator, AnyTypeNode
 
 			//if it is a base simple type, choose a pre-defined validator
 			if (!xsdNode) {
-				if (type && type.namespaceURI === Xml.xs && type.name in strMappings) {
+				if (type && type.namespaceURI === xsd.xs && type.name in strMappings) {
 					return new strMappings[type.name](node, xsdElement, this);
 				}
 			}
 			//simple type
-			else if (xsdNode.namespaceURI === Xml.xs && xsdNode.localName === 'simpleType') {
+			else if (xsdNode.namespaceURI === xsd.xs && xsdNode.localName === 'simpleType') {
 				var basetype = this.xsdLibrary.findBaseTypeFor(xsdNode);
 				if (basetype in strMappings) {
 					return new strMappings[basetype](node, xsdElement, this);
 				}
 			}
 			//complex type
-			else if (xsdNode.namespaceURI === Xml.xs && xsdNode.localName === 'complexType') {
+			else if (xsdNode.namespaceURI === xsd.xs && xsdNode.localName === 'complexType') {
 				if (xsdNode.getAttribute('abstract') === true) {
 					throw new TypeError('An abstract type should only be used for extension/restriction.');
 				}

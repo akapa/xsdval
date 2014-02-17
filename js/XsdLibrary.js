@@ -1,10 +1,10 @@
-define(['underscore', 'objTools', 'Library', 'Xml', 'text!xsdval/basetypes.xsd'],
-function (_, objTools, Library, Xml, basetypesXsd) {
+define(['underscore', 'objTools', 'Library', 'xsd', 'text!xsdval/basetypes.xsd'],
+function (_, objTools, Library, xsd, basetypesXsd) {
 
 	var xsdLibrary = objTools.make(Library, {
 		init: function (defs) {
 			defs = defs || [];
-			var xsd = Xml.parseXml(basetypesXsd);
+			var xsd = xsd.parseXml(basetypesXsd);
 			(new Library).init.call(this, defs.concat([xsd]));
 			return this;
 		},
@@ -21,7 +21,7 @@ function (_, objTools, Library, Xml, basetypesXsd) {
 			var element;
 			for (var i = 0, l = xsds.length; i < l; i++) {
 				element = _(xsds[i].documentElement.children).find(function (child) {
-					return child.namespaceURI === Xml.xs
+					return child.namespaceURI === xsd.xs
 						&& child.localName === 'element'
 						&& child.getAttribute('name') === name;
 				});
@@ -71,14 +71,14 @@ function (_, objTools, Library, Xml, basetypesXsd) {
 		},
 		getRestrictedType: function (node) {
 			var	element = _(node.children).find(function (child) {
-				return child.namespaceURI === Xml.xs
+				return child.namespaceURI === xsd.xs
 					&& child.localName === 'restriction';
 			});
 			return this.getTypeFromNodeAttr(element, 'base');
 		},
 		findRestrictingFacets: function (node) {
 			var	element = _(node.children).find(function (child) {
-				return child.namespaceURI === Xml.xs
+				return child.namespaceURI === xsd.xs
 					&& child.localName === 'restriction';
 			});
 			return element.children;

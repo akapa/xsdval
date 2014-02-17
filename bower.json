@@ -1,0 +1,38 @@
+{
+  "name": "kapa/xsdvalidator",
+  "version": "0.0.1",
+  "description": "Validate XML against XSD in Javascript",
+  "main": "dist/xsdvalidator.js",
+  "dependencies": {
+    "requirejs": "latest",
+    "requirejs-text": "latest",
+    "underscore": "latest",
+    "xsd": "file:///home/kapa/galina/kapa/xsd/.git/",
+    "Library": "file:///home/kapa/galina/kapa/Library/.git/",
+    "objTools": "file:///home/kapa/galina/kapa/objTools/.git/"    
+  },
+  "install": {
+    "path": {
+      "js": "js/lib"
+    },
+    "sources" : {
+      "requirejs-text" : "bower_components/requirejs-text/text.js"
+    }
+  },
+  "keywords": [
+    "xml",
+    "xsd",
+    "validation"
+  ],
+  "authors": [
+    "Kapa"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

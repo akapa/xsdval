@@ -1,12 +1,12 @@
-define(['underscore', 'objTools', 'Xml', 'xsdval/nodeValidator/NodeValidator',
+define(['underscore', 'objTools', 'xsd', 'xsdval/nodeValidator/NodeValidator',
 	 'xsdval/XmlValidationResult', 'xsdval/XmlValidationError'],
-function (_, objTools, Xml, NodeValidator, XmlValidationResult, XmlValidationError) {
+function (_, objTools, xsd, NodeValidator, XmlValidationResult, XmlValidationError) {
 	var complexTypeNodeValidator = objTools.make(NodeValidator, {
 		validate: function () {
 			var errors = [];
 
 			//check if the whole node is nil
-			if (this.node.getAttributeNS(Xml.xs, 'nil') === 'true') {
+			if (this.node.getAttributeNS(xsd.xs, 'nil') === 'true') {
  				if (this.definition.getAttribute('nillable') !== 'true') {
  					errors.push(new XmlValidationError(elem, this.definition, 'nillable'));
 				}
@@ -52,7 +52,7 @@ function (_, objTools, Xml, NodeValidator, XmlValidationResult, XmlValidationErr
 
 			_(xmlNodes).each(function (elem) {
 				//check for nil elements
-				if (elem.getAttributeNS(Xml.xsi, 'nil') === 'true') {
+				if (elem.getAttributeNS(xsd.xsi, 'nil') === 'true') {
  					if (!nillable) {
  						errors.push(new XmlValidationError(elem, xsdNode, 'nillable'));
  					}
@@ -77,7 +77,7 @@ function (_, objTools, Xml, NodeValidator, XmlValidationResult, XmlValidationErr
 			//if there are no more elements, let's get to possible extended defs
 			if (next === null) {
 				//find closest extension parent
-				var extension = Xml.getClosestAncestor(childCurrent, Xml.xs, 'extension');
+				var extension = xsd.getClosestAncestor(childCurrent, xsd.xs, 'extension');
 				if (extension) {
 					var extendedType = this.xsdLibrary
 						.findTypeDefinitionFromNodeAttr(extension, 'base');

@@ -1,6 +1,6 @@
-define(['underscore', 'objTools', 'Xml', 'xsdval/nodeValidator/NodeValidator',
+define(['underscore', 'objTools', 'xsdval/nodeValidator/NodeValidator',
 	'xsdval/primitiveUnserializers', 'xsdval/XmlValidationResult', 'xsdval/XmlValidationError'],
-function (_, objTools, Xml, NodeValidator, primitiveUnserializers,
+function (_, objTools, NodeValidator, primitiveUnserializers,
 	XmlValidationResult, XmlValidationError) {
 	
 	var simpleTypeNodeValidator = objTools.make(NodeValidator, {

@@ -3,10 +3,11 @@ requirejs.config({
 		'xsdval': '.',
 		'underscore': 'lib/underscore',
         'text': 'lib/text',
-        'Xml': 'lib/Xml',
+        'xsd': 'lib/xsd',
+        'xml': 'lib/xml',
         'Library': 'lib/Library',
         'objTools': 'lib/objTools',
-        'xsdvalidator': '../dist/xsdvalidator'
+        'xsdvalidator': 'XmlValidator'
     },
 	shim: {
 		'underscore': {
@@ -15,12 +16,12 @@ requirejs.config({
 	}
 });
 
-requirejs(['underscore', 'Xml', 'xsdvalidator'],
-function (_, Xml, XmlValidator) {
+requirejs(['underscore', 'xsd', 'xsdvalidator'],
+function (_, xsd, XmlValidator) {
 
 	var doValidate = function () {
-		var xsd = Xml.parseXml(document.getElementById('xsd').value);
-		var dom = Xml.parseXml(document.getElementById('show').value);
+		var xsd = xml.parseXml(document.getElementById('xsd').value);
+		var dom = xml.parseXml(document.getElementById('show').value);
 		console.group('XML Validation on ', dom, ' with ', xsd);
 
 		var validator = new XmlValidator();
