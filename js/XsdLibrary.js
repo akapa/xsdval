@@ -9,9 +9,7 @@ function (_, objTools, Library, xsd, basetypesXsd) {
 		},
 		addItem: function (def, name) {
 			var ns = name || def.documentElement.getAttributeNS(null, 'targetNamespace');
-			var xsdCollection = this.exists(ns) 
-				? this.getItem(ns)
-				: [];
+			var xsdCollection = this.exists(ns)	? this.getItem(ns) : [];
 			xsdCollection.push(def);
 			this.items[ns] = xsdCollection;
 		},
@@ -19,11 +17,7 @@ function (_, objTools, Library, xsd, basetypesXsd) {
 			var xsds = this.getItem(namespace) || [];
 			var element;
 			for (var i = 0, l = xsds.length; i < l; i++) {
-				element = _(xsds[i].documentElement.children).find(function (child) {
-					return child.namespaceURI === xsd.xs
-						&& child.localName === 'element'
-						&& child.getAttribute('name') === name;
-				});
+				element = xsd.findElement(xsds[i], name);
 				if (element) {
 					return element;
 				}
@@ -32,31 +26,17 @@ function (_, objTools, Library, xsd, basetypesXsd) {
 		},
 		findTypeDefinition: function (namespace, name) {
 			var xsds = this.getItem(namespace) || [];
-			var selector = 'complexType[name="' + name + '"], simpleType[name="' + name + '"]';
 			var xsdNodes;
 			for (var i = 0, l = xsds.length; i < l; i++) {
-				xsdNodes = xsds[i].querySelectorAll(selector);
+				xsdNodes = xsd.findTypeDefinition(xsds[i], name);
 				if (xsdNodes.length > 0) {
 					return xsdNodes[0];
 				}
 			}
 			return null;
 		},
-		getTypeFromNodeAttr: function (node, typeAttr, typeAttrNS) {
-			var type = typeAttrNS 
-				? node.getAttributeNS(typeAttrNS, typeAttr)
-				: node.getAttribute(typeAttr);
-			if (type) {
-				var parts = type.split(':');
-				return {
-					namespaceURI: node.lookupNamespaceURI(parts[0]),
-					name: parts[1]
-				};
-			}
-			else return null;
-		},
 		findTypeDefinitionFromNodeAttr: function (node, typeAttr, typeAttrNS) {
-			var type = this.getTypeFromNodeAttr(node, typeAttr, typeAttrNS);
+			var type = getTypeFromNodeAttr.xsd(node, typeAttr, typeAttrNS);
 			return this.findTypeDefinition(type.namespaceURI, type.name);
 		},
 		findBaseTypeFor: function (node) {
@@ -67,20 +47,6 @@ function (_, objTools, Library, xsd, basetypesXsd) {
 				xsdNow = this.findTypeDefinition(basetype.namespaceURI, basetype.name);
 			} while (xsdNow !== null);
 			return basetype.name;
-		},
-		getRestrictedType: function (node) {
-			var	element = _(node.children).find(function (child) {
-				return child.namespaceURI === xsd.xs
-					&& child.localName === 'restriction';
-			});
-			return this.getTypeFromNodeAttr(element, 'base');
-		},
-		findRestrictingFacets: function (node) {
-			var	element = _(node.children).find(function (child) {
-				return child.namespaceURI === xsd.xs
-					&& child.localName === 'restriction';
-			});
-			return element.children;
 		}
 	});
 
