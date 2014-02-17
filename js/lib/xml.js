@@ -1,62 +1,6 @@
 define(function () {
 
 	var xml = {
-		makeAttribute: function (key, value) {
-			return [' ', key, '="', value, '"'].join('');
-		},
-		makeOpenTag : function (name, att) {
-			var att = att || {};
-			var a = _.map(att, function (value, key) {
-					return [' ', key, '="', value, '"'].join('');
-				}).join('');
-			return ['<', name, a, '>'].join('');
-		},
-		makeCloseTag : function (name) {
-			return ['</', name, '>'].join('');
-		},
-		makeTag: function (name, val, att) {
-			var value = val;
-			if (!name) {
-				return value;
-			}
-			return this.makeOpenTag(name, att)
-				+ value
-				+ this.makeCloseTag(name);
-		},
-		makeXmlHeader : function () {
-			return '<?xml version="1.0" encoding="UTF-8"?>';
-		},
-		parseXml: function (s) {
-			if (typeof window.DOMParser != "undefined") {
-		        return ( new window.DOMParser() ).parseFromString(s, "text/xml");
-			} else if (typeof window.ActiveXObject != "undefined" && new window.ActiveXObject("Microsoft.XMLDOM")) {
-			    var xmlDoc = new window.ActiveXObject("Microsoft.XMLDOM");
-			    xmlDoc.async = "false";
-			    xmlDoc.loadXML(s);
-			    return xmlDoc;
-			} else {
-			    throw new Error("No XML parser found");
-			}
-		},
-		getNodeText: function (node) {
-			return node.textContent;
-		},
-		setNodeText: function (node, value) {
-			node.textContent = value;
-		},
-		domToXml: function (dom) {
-			return new XMLSerializer().serializeToString(dom);
-		},
-		getClosestAncestor: function (node, namespace, tagname) {
-			var node = node.parentElement;
-			while (!(node.namespaceURI === namespace && node.localName === tagname)) {
-				node = node.parentElement;
-				if (!node) {
-					return null;
-				}
-			}
-			return node;
-		},
 		createDocument: function (name, namespaces) {
 			var doc = document.implementation.createDocument(namespaces[0], name, null);
 			_(namespaces).each(function (ns, nskey) {
@@ -71,10 +15,40 @@ define(function () {
 			});
 			return doc;
 		},
-		format: function (xml) {
+		parseToDom: function (s) {
+			if (typeof window.DOMParser != "undefined") {
+		        return (new window.DOMParser()).parseFromString(s, "text/xml");
+			} else if (typeof window.ActiveXObject != "undefined" && new window.ActiveXObject("Microsoft.XMLDOM")) {
+			    var xmlDoc = new window.ActiveXObject("Microsoft.XMLDOM");
+			    xmlDoc.async = "false";
+			    xmlDoc.loadXML(s);
+			    return xmlDoc;
+			} else {
+			    throw new Error("No XML parser found");
+			}
+		},
+		serializeToString: function (dom) {
+			return new XMLSerializer().serializeToString(dom);
+		},
+		getNodeText: function (node) {
+			return node.textContent;
+		},
+		setNodeText: function (node, value) {
+			node.textContent = value;
+		},
+		getClosestAncestor: function (node, namespace, tagname) {
+			var node = node.parentElement;
+			while (!(node.namespaceURI === namespace && node.localName === tagname)) {
+				node = node.parentElement;
+				if (!node) {
+					return null;
+				}
+			}
+			return node;
+		},
+		formatString: function (xml) {
 		    var formatted = '';
-		    var reg = /(>)(<)(\/*)/g;
-		    xml = xml.replace(reg, '$1\r\n$2$3');
+		    xml = xml.replace(/(>)(<)(\/*)/g, '$1\r\n$2$3');
 		    var pad = 0;
 
 		    _.each(xml.split('\r\n'), function(node, index) {
