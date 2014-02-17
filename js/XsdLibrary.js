@@ -36,14 +36,14 @@ function (_, objTools, Library, xsd, basetypesXsd) {
 			return null;
 		},
 		findTypeDefinitionFromNodeAttr: function (node, typeAttr, typeAttrNS) {
-			var type = getTypeFromNodeAttr.xsd(node, typeAttr, typeAttrNS);
+			var type = xsd.getTypeFromNodeAttr(node, typeAttr, typeAttrNS);
 			return this.findTypeDefinition(type.namespaceURI, type.name);
 		},
 		findBaseTypeFor: function (node) {
 			var xsdNow = node;
 			var basetype;
 			do {
-				basetype = this.getRestrictedType(xsdNow);
+				basetype = xsd.getRestrictedType(xsdNow);
 				xsdNow = this.findTypeDefinition(basetype.namespaceURI, basetype.name);
 			} while (xsdNow !== null);
 			return basetype.name;

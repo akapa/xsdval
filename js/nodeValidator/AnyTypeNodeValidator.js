@@ -5,7 +5,7 @@ function (_, objTools, xsd, NodeValidator, XmlValidationResult, XmlValidationErr
 	var anyTypehNodeValidator = objTools.make(NodeValidator, {
 		type: 'anyType',
 		validate: function () {
-			var type = this.xsdLibrary.getTypeFromNodeAttr(this.node, 'type', xsd.xsi);
+			var type = xsd.getTypeFromNodeAttr(this.node, 'type', xsd.xsi);
 			var validator = this.validatorFactory.getValidator(typeDef, this.node, type);
 			return validator.validate();
 		}

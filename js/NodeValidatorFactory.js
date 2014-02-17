@@ -19,7 +19,7 @@ function (_, objTools, xsd, NodeValidator, ComplexTypeNodeValidator, AnyTypeNode
 		},
 		getValidator: function (xsdElement, node, type) {
 			//looking up a typeDefinition (complexType, simpleType or null)
-			type = type || this.xsdLibrary.getTypeFromNodeAttr(xsdElement, 'type');
+			type = type || xsd.getTypeFromNodeAttr(xsdElement, 'type');
 			var xsdNode = type
 				? this.xsdLibrary.findTypeDefinition(type.namespaceURI, type.name)
 				: xsdElement.children[0];

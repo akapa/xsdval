@@ -4,7 +4,7 @@ define(['objTools', 'xml'], function (objTools, xml) {
 		xs: 'http://www.w3.org/2001/XMLSchema',
 		xsi: 'http://www.w3.org/2001/XMLSchema-instance',
 		findElement: function (doc, name) {
-			_(doc.documentElement.children).find(function (child) {
+			return _(doc.documentElement.children).find(function (child) {
 				return child.namespaceURI === xsd.xs
 					&& child.localName === 'element'
 					&& child.getAttribute('name') === name;
@@ -12,7 +12,7 @@ define(['objTools', 'xml'], function (objTools, xml) {
 		},
 		findTypeDefinition: function (doc, type) {
 			var selector = 
-				 'complexType[name="' + type + '"], '
+				 'complexType[name="' + type + '"],'
 				+ 'simpleType[name="' + type + '"]';
 			return doc.querySelectorAll(selector);
 		},

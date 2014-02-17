@@ -5,7 +5,7 @@ function (_, objTools, xsd, NodeValidator, XmlValidationResult, XmlValidationErr
 	var anySimpleTypeNodeValidator = objTools.make(NodeValidator, {
 		type: 'anySimpleType',
 		validate: function () {
-			var type = this.xsdLibrary.getTypeFromNodeAttr(this.node, 'type', xsd.xsi);
+			var type = xsd.getTypeFromNodeAttr(this.node, 'type', xsd.xsi);
 			var xsdNode = this.xsdLibrary.findTypeDefinition(type.namespaceURI, type.name);
 			if (xsdNode.namespaceURI === xsd.xs && xsdNode.localName === 'complexType') {
 				return new XmlValidationResult([

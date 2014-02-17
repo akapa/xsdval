@@ -43,13 +43,13 @@ function (_, objTools, xsd, NodeValidator, primitiveUnserializers,
 		},
 		validateFacets: function () {
 			var errors = [];	
-			var type = this.xsdLibrary.getTypeFromNodeAttr(this.definition, 'type');
+			var type = xsd.getTypeFromNodeAttr(this.definition, 'type');
 			var current, findings, facets, enums;
 			var validatedFacets = [];
 			while (current = type 
 				? this.xsdLibrary.findTypeDefinition(type.namespaceURI, type.name)
 				: this.definition[0]) {
-					facets = this.xsdLibrary.findRestrictingFacets(current);
+					facets = xsd.findRestrictingFacets(current);
 					enums = [];
 					findings = _(facets).map(_(function (elem) {
 						if (elem.localName === 'enumeration') {
@@ -61,7 +61,7 @@ function (_, objTools, xsd, NodeValidator, primitiveUnserializers,
 						findings.push(this.validateFacet(enums, validatedFacets));
 					}
 					errors = errors.concat(_(findings).compact());
-					type = this.xsdLibrary.getRestrictedType(current);
+					type = xsd.getRestrictedType(current);
 			}
 			return errors;
 		},
