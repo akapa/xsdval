@@ -20,6 +20,7 @@
   <xs:simpleType name="pos">
     <xs:restriction base="xs:int">
       <xs:minExclusive value="20"/>
+      <xs:assertion test="$value != 56" />
     </xs:restriction>
   </xs:simpleType>
 

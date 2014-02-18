@@ -25,6 +25,9 @@ function (_, objTools, xsd, NodeValidator, primitiveUnserializers,
 		getValue: function () {
 			return xsd.getNodeText(this.node);
 		},
+		getXpathValue: function () {
+			return this.getValue();
+		},
 		getRealValue: function (type, value) {
 			var v = value || this.getValue();
 			return type in primitiveUnserializers 
@@ -68,11 +71,12 @@ function (_, objTools, xsd, NodeValidator, primitiveUnserializers,
 		validateFacet: function (facetNode, validatedFacets) {
 			var enumMode = _(facetNode).isArray();
 			var facetName = enumMode ? facetNode[0].localName : facetNode.localName;
+			var valueAttr = facetName === 'assertion' ? 'test' : 'value';
 			var facetValue = enumMode 
 				? _(facetNode).map(function (elem) {
-						return elem.getAttribute('value');
+						return elem.getAttribute(valueAttr);
 					})
-				: facetNode.getAttribute('value');
+				: facetNode.getAttribute(valueAttr);
 			
 			if (this.getAllowedFacets().indexOf(facetName) === -1) {
 				return;
@@ -83,7 +87,9 @@ function (_, objTools, xsd, NodeValidator, primitiveUnserializers,
 				return;
 			}
 
-			validatedFacets.push(facetName);
+			if (facetName !== 'assertion') {
+				validatedFacets.push(facetName);
+			}
 			return this.invokeFacetValidation(facetName, facetValue, facetNode);
 		},
 		invokeFacetValidation: function (facetName, facetValue, facetNode) {
@@ -116,6 +122,11 @@ function (_, objTools, xsd, NodeValidator, primitiveUnserializers,
 		},
 		validateEnumeration: function (values) {
 			return values.indexOf(this.getValue()) !== -1;
+		},
+		validateAssertion: function (xpath) {
+			xpath = xpath.replace(/\$value/, this.getXpathValue());
+			var res =  document.evaluate(xpath, this.node, null, XPathResult.BOOLEAN_TYPE);
+			return res.booleanValue;
 		}
 	});
 

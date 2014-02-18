@@ -17,7 +17,7 @@ function (_, objTools, SimpleTypeNodeValidator, XmlValidationResult, XmlValidati
 				'minInclusive',
 				'maxExclusive',
 				'minExclusive',
-				'assertions'
+				'assertion'
 			];
 		}
 	});

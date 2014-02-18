@@ -19,7 +19,7 @@ function (_, objTools, SimpleTypeNodeValidator, XmlValidationResult, XmlValidati
 				'maxExclusive',
 				'minInclusive',
 				'minExclusive',
-				'assertions'
+				'assertion'
 			];
 		},
 		validateTotalDigits: function (facetValue) {

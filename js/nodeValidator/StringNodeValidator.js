@@ -11,7 +11,7 @@ function (_, objTools, SimpleTypeNodeValidator, XmlValidationResult, XmlValidati
 				'maxLength', 
 				'pattern', 
 				'enumeration', 
-				'assertions'
+				'assertion'
 			];
 		},
 		validateMaxLength: function (facetValue) {

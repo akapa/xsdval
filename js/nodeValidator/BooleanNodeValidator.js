@@ -12,7 +12,7 @@ function (_, objTools, SimpleTypeNodeValidator, XmlValidationResult, XmlValidati
 		getAllowedFacets: function () {
 			return [
 				'pattern', 
-				'assertions'
+				'assertion'
 			];
 		}
 	});
