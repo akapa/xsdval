@@ -1,6 +1,6 @@
 ({
     baseUrl: 'js',
-    exclude: ['underscore', 'objTools', 'Library', 'xml', 'xsd', 'text'],
+    exclude: ['underscore', 'objTools', 'Library', 'xml', 'xsd', 'text', 'wgxpath'],
     paths: {
         'underscore': 'lib/underscore',
         'text': 'lib/text',
@@ -8,6 +8,7 @@
         'xml': 'lib/xml',
         'Library': 'lib/Library',
         'objTools': 'lib/objTools',
+        'wgxpath': 'lib/wgxpath',
         'xsdval': '.'
     },
     name: 'xsdvalidator',

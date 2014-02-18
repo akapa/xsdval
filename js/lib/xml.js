@@ -1,15 +1,13 @@
 define(function () {
 
 	var xml = {
-		createDocument: function (name, namespaces) {
-			var doc = document.implementation.createDocument(namespaces[0], name, null);
+		createDocument: function (name, namespaces, prefix) {
+			var qname = prefix ? [prefix, name].join(':') : name;
+			var doc = document.implementation.createDocument(namespaces[0], qname, null);
 			_(namespaces).each(function (ns, nskey) {
-				if (!nskey || nskey == '0') {
-					nskey = 'my';
-				}
 				doc.documentElement.setAttributeNS(
 					'http://www.w3.org/2000/xmlns/', 
-					'xmlns:' + nskey, 
+					['xmlns', nskey].join(':'), 
 					ns
 				);
 			});

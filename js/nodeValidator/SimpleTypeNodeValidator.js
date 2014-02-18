@@ -14,13 +14,13 @@ function (_, objTools, xsd, NodeValidator, primitiveUnserializers,
 			return _(extensions).pick(this.getAllowedFacets());
 		},
 		validate: function () {
-			var errors = [];
-			errors = errors.concat(
+			var res = new XmlValidationResult();
+			res.add([].concat(
 				this.validateBaseType(), 
 				this.validateBaseFacets(), 
 				this.validateFacets()
-			);
-			return new XmlValidationResult(errors);
+			));
+			return res;
 		},
 		getValue: function () {
 			return xsd.getNodeText(this.node);
@@ -122,6 +122,6 @@ function (_, objTools, xsd, NodeValidator, primitiveUnserializers,
 	return function SimpleTypeNodeValidator () {
 		var obj = objTools.construct(simpleTypeNodeValidator, SimpleTypeNodeValidator);
 		return obj.init.apply(obj, arguments);
-	}
+	};
 
 });

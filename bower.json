@@ -7,6 +7,7 @@
     "requirejs": "latest",
     "requirejs-text": "latest",
     "underscore": "latest",
+    "wgxpath": "https://wicked-good-xpath.googlecode.com/files/wgxpath.install.js",
     "xsd": "file:///home/kapa/galina/kapa/xsd/.git/",
     "Library": "file:///home/kapa/galina/kapa/Library/.git/",
     "objTools": "file:///home/kapa/galina/kapa/objTools/.git/"    
@@ -16,7 +17,12 @@
       "js": "js/lib"
     },
     "sources" : {
-      "requirejs-text" : "bower_components/requirejs-text/text.js"
+      "requirejs-text" : "bower_components/requirejs-text/text.js",
+      "wgxpath": {
+        "mapping": [
+          { "bower_components/wgxpath/index.js": "wgxpath.js" }
+        ]
+      }
     }
   },
   "keywords": [

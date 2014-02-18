@@ -7,7 +7,8 @@ requirejs.config({
         'xml': 'lib/xml',
         'Library': 'lib/Library',
         'objTools': 'lib/objTools',
-        'xsdvalidator': 'XmlValidator'
+        'wgxpath': 'lib/wgxpath',
+       'xsdvalidator': 'XmlValidator'
     },
 	shim: {
 		'underscore': {

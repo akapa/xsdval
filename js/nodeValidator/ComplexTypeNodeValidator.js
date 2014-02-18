@@ -1,25 +1,25 @@
 define(['underscore', 'objTools', 'xsd', 'xsdval/nodeValidator/NodeValidator',
 	 'xsdval/XmlValidationResult', 'xsdval/XmlValidationError'],
 function (_, objTools, xsd, NodeValidator, XmlValidationResult, XmlValidationError) {
+
 	var complexTypeNodeValidator = objTools.make(NodeValidator, {
 		validate: function () {
-			var errors = [];
+			var res = new XmlValidationResult();
 
 			//check if the whole node is nil
 			if (this.node.getAttributeNS(xsd.xs, 'nil') === 'true') {
  				if (this.definition.getAttribute('nillable') !== 'true') {
- 					errors.push(new XmlValidationError(elem, this.definition, 'nillable'));
+ 					res.add(new XmlValidationError(elem, this.definition, 'nillable'));
 				}
 			}
 			else {
 				var typeDef = this.xsdLibrary.findTypeDefinitionFromNodeAttr(this.definition, 'type');
 				var xsdNow = this.getFirstElement(typeDef);
 				do {
-					errors = errors.concat(this.validateChild(xsdNow));
+					res.add(this.validateChild(xsdNow));
 				} while (xsdNow = this.getNextElement(xsdNow));
 			}
-
-			return new XmlValidationResult(errors);
+			return res;
 		},
 		validateChild: function (xsdNow) {
 			var errors = [];
@@ -111,5 +111,6 @@ function (_, objTools, xsd, NodeValidator, XmlValidationResult, XmlValidationErr
 	return function ComplexTypeNodeValidator () {
 		var obj = objTools.construct(complexTypeNodeValidator, ComplexTypeNodeValidator);
 		return obj.init.apply(obj, arguments);
-	}
+	};
+	
 });
