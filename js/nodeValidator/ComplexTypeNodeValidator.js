@@ -22,7 +22,7 @@ function (_, objTools, xsd, NodeValidator, XmlValidationResult, XmlValidationErr
 				//check assertions
 				var assert = typeDef.getElementsByTagNameNS(xsd.xs, 'assert');
 				if (assert.length) {
-					res.add(this.validateAssert(assert[0]));
+					res.add(this.validateAssert(assert));
 				}
 			}
 			return res;
@@ -92,13 +92,18 @@ function (_, objTools, xsd, NodeValidator, XmlValidationResult, XmlValidationErr
 			}
 			return next;
 		},
-		validateAssert: function (assertNode) {
-			var xpath = assertNode.getAttribute('test');
-			var res =  document.evaluate(xpath, this.node, null, XPathResult.BOOLEAN_TYPE);
-			if (res.booleanValue === false) {
-				return new XmlValidationError(this.node, assertNode, 'assert');
+		validateAssert: function (assertNodes) {
+			var errors = [];
+			var el, xpath, res;
+			for (var i = 0, l = assertNodes.length; i < l; i++) {
+				el = assertNodes[i];
+				xpath = el.getAttribute('test');
+				res =  document.evaluate(xpath, this.node, null, XPathResult.BOOLEAN_TYPE);
+				if (res.booleanValue === false) {
+					errors.push(new XmlValidationError(this.node, el, 'assert'));
+				}
 			}
-			return null;
+			return errors;
 		},
 		parseMinMaxOccurs: function (xsdNode) {
 			var min = xsdNode.getAttribute('minOccurs');

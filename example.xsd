@@ -54,6 +54,7 @@
       </xs:extension>
     </xs:complexContent>
     <xs:assert test="amount > id" />
+    <xs:assert test="amount > 200" />
   </xs:complexType>
 
   <xs:complexType name="verybasic" abstract="true">
