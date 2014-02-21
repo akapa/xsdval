@@ -7,8 +7,10 @@ define(['underscore', 'objTools'], function (_, objTools) {
 			return this;
 		},
 		add: function (errors) {
-			this.errors = this.errors.concat(errors);
-			this.checkSuccess();
+			if (errors) {
+				this.errors = this.errors.concat(errors);
+				this.checkSuccess();
+			}
 		},
 		checkSuccess: function () {
 			this.success = this.errors.length === 0;

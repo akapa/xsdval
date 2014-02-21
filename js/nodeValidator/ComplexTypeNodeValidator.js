@@ -18,6 +18,12 @@ function (_, objTools, xsd, NodeValidator, XmlValidationResult, XmlValidationErr
 				do {
 					res.add(this.validateChild(xsdNow));
 				} while (xsdNow = this.getNextElement(xsdNow));
+
+				//check assertions
+				var assert = typeDef.getElementsByTagNameNS(xsd.xs, 'assert');
+				if (assert.length) {
+					res.add(this.validateAssert(assert[0]));
+				}
 			}
 			return res;
 		},
@@ -85,6 +91,14 @@ function (_, objTools, xsd, NodeValidator, XmlValidationResult, XmlValidationErr
 				}
 			}
 			return next;
+		},
+		validateAssert: function (assertNode) {
+			var xpath = assertNode.getAttribute('test');
+			var res =  document.evaluate(xpath, this.node, null, XPathResult.BOOLEAN_TYPE);
+			if (res.booleanValue === false) {
+				return new XmlValidationError(this.node, assertNode, 'assert');
+			}
+			return null;
 		},
 		parseMinMaxOccurs: function (xsdNode) {
 			var min = xsdNode.getAttribute('minOccurs');
