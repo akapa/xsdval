@@ -36,7 +36,7 @@ function (_, objTools, xsd, NodeValidator, XmlValidationResult, XmlValidationErr
 			});
 
 			//minOccurs, maxOccurs check
-			var occurLimit = this.parseMinMaxOccurs(xsdNow);
+			var occurLimit = xsd.parseMinMaxOccurs(xsdNow);
 			if (xmlNow.length > occurLimit.max) {
 				errors.push(new XmlValidationError(this.node, xsdNow, 'maxOccurs'));
 			}
@@ -104,26 +104,6 @@ function (_, objTools, xsd, NodeValidator, XmlValidationResult, XmlValidationErr
 				}
 			}
 			return errors;
-		},
-		parseMinMaxOccurs: function (xsdNode) {
-			var min = xsdNode.getAttribute('minOccurs');
-			if (min === null || min === '') {
-				min = 1;
-			}
-			else {
-				min = parseInt(min, 10);
-			}
-			var max = xsdNode.getAttribute('maxOccurs');
-			if (max === null || max === '') {
-				max = 1;
-			}
-			else if (max === 'unbounded') {
-				max = Infinity;
-			}
-			else {
-				max = parseInt(max, 10);
-			}
-			return { min: min, max: max	};
 		}
 	});
 
