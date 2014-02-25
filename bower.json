@@ -14,7 +14,8 @@
   },
   "devDependencies": {
     "karma": "~0.10",
-    "karma-jasmine": "~0.2.0"
+    "karma-jasmine": "~0.2.0",
+    "karma-requirejs": "~0.2.0"
   },
   "install": {
     "path": {
