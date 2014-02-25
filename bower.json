@@ -12,6 +12,10 @@
     "Library": "file:///home/kapa/galina/kapa/Library/.git/",
     "objTools": "file:///home/kapa/galina/kapa/objTools/.git/"    
   },
+  "devDependencies": {
+    "karma": "~0.10",
+    "karma-jasmine": "~0.2.0"
+  },
   "install": {
     "path": {
       "js": "js/lib"
