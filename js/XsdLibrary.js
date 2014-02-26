@@ -37,7 +37,9 @@ function (_, objTools, Library, xsd, basetypesXsd) {
 		},
 		findTypeDefinitionFromNodeAttr: function (node, typeAttr, typeAttrNS) {
 			var type = xsd.getTypeFromNodeAttr(node, typeAttr, typeAttrNS);
-			return this.findTypeDefinition(type.namespaceURI, type.name);
+			return type
+				? this.findTypeDefinition(type.namespaceURI, type.name)
+				: null;
 		},
 		findBaseTypeFor: function (node) {
 			var xsdNow = node;

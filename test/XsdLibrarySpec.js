@@ -118,16 +118,48 @@ define(['xsdval/XsdLibrary', 'xsd'], function (XsdLibrary, xsd) {
 
 		describe("findTypeDefinitionFromNodeAttr", function() {
 
-			/*it("calls xsd.getTypeFromNodeAttr with the right params", function() {
+			var elem = schema.createElementNS(xsdns, 'xs:element');
+			schema.documentElement.appendChild(elem);
+			elem.setAttributeNS(testns, 'type', 'xs:integer');
 
-				var elem = schema.createElementNS(xsdns, 'element');
-				elem.setAttributeNS(testns, 'type', 'xs:integer');
+			it("calls xsd.getTypeFromNodeAttr with the right params", function() {
 
 				spyOn(xsd, 'getTypeFromNodeAttr');
 				xsdlib.findTypeDefinitionFromNodeAttr(elem, 'type', testns);
 				expect(xsd.getTypeFromNodeAttr).toHaveBeenCalledWith(elem, 'type', testns);
 
-			});*/
+			});
+
+			it("calls findTypeDefinition with the right params when type is found", function() {
+
+				spyOn(xsdlib, 'findTypeDefinition').and.callThrough();
+				var res = xsdlib.findTypeDefinitionFromNodeAttr(elem, 'type');
+				expect(xsdlib.findTypeDefinition).toHaveBeenCalledWith(xsdns, 'integer');
+				expect(res).toEqual(jasmine.any(Element));
+
+			});
+
+			it("returns null when no type found in attribute", function() {
+
+				elem.removeAttributeNS(testns, 'type');
+				var res = xsdlib.findTypeDefinitionFromNodeAttr(elem, 'type', testns);
+				expect(res).toBeNull();
+
+			});
+
+			schema.documentElement.removeChild(elem);
+
+		});
+
+		describe("findBaseTypeFor", function() {
+
+			it("finds base type for xs:integer", function() {
+
+				var integerXsd = xsdlib.findTypeDefinition(xsdns, 'integer');
+				var bt = xsdlib.findBaseTypeFor(integerXsd);
+				expect(bt).toBe('decimal');
+
+			});
 
 		});
 
