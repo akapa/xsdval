@@ -349,11 +349,11 @@ function (_, objTools, xsd, NodeValidator, primitiveUnserializers,
 			);
 			return new XmlValidationResult(errors);
 		},
-		getValue: function () {
+		getNodeValue: function () {
 			return xsd.getNodeText(this.node);
 		},
-		getRealValue: function (type, value) {
-			var v = value || this.getValue();
+		getTypedNodeValue: function (type, value) {
+			var v = value || this.getNodeValue();
 			return type in primitiveUnserializers 
 				? primitiveUnserializers[type](v)
 				: v;
@@ -427,22 +427,22 @@ function (_, objTools, xsd, NodeValidator, primitiveUnserializers,
 			var r = _(facetValue).isRegExp() 
 				? facetValue 
 				: new RegExp(['^', facetValue, '$'].join(''));
-			return r.test(this.getValue());
+			return r.test(this.getNodeValue());
 		},
 		validateMaxInclusive: function (facetValue) {
-			return this.getRealValue(this.type) <= this.getRealValue(this.type, facetValue);
+			return this.getTypedNodeValue(this.type) <= this.getTypedNodeValue(this.type, facetValue);
 		},
 		validateMinInclusive: function (facetValue) {
-			return this.getRealValue(this.type) >= this.getRealValue(this.type, facetValue);
+			return this.getTypedNodeValue(this.type) >= this.getTypedNodeValue(this.type, facetValue);
 		},
 		validateMaxExclusive: function (facetValue) {
-			return this.getRealValue(this.type) < this.getRealValue(this.type, facetValue);
+			return this.getTypedNodeValue(this.type) < this.getTypedNodeValue(this.type, facetValue);
 		},
 		validateMinExclusive: function (facetValue) {
-			return this.getRealValue(this.type) > this.getRealValue(this.type, facetValue);
+			return this.getTypedNodeValue(this.type) > this.getTypedNodeValue(this.type, facetValue);
 		},
 		validateEnumeration: function (values) {
-			return values.indexOf(this.getValue()) !== -1;
+			return values.indexOf(this.getNodeValue()) !== -1;
 		}
 	});
 
@@ -507,10 +507,10 @@ function (_, objTools, SimpleTypeNodeValidator, XmlValidationResult, XmlValidati
 			];
 		},
 		validateTotalDigits: function (facetValue) {
-			return this.getValue().replace(/\D/g, '').length <= facetValue;
+			return this.getNodeValue().replace(/\D/g, '').length <= facetValue;
 		},
 		validateFractionDigits: function (facetValue) {
-			var v = this.getValue();
+			var v = this.getNodeValue();
 			var fracDigits = v.indexOf('.') === -1
 				? 0
 				: v.split('.')[1].length;
@@ -596,13 +596,13 @@ function (_, objTools, SimpleTypeNodeValidator, XmlValidationResult, XmlValidati
 			];
 		},
 		validateMaxLength: function (facetValue) {
-			return this.getValue().length <= facetValue;
+			return this.getNodeValue().length <= facetValue;
 		},
 		validateMinLength: function (facetValue) {
-			return this.getValue().length >= facetValue;
+			return this.getNodeValue().length >= facetValue;
 		},
 		validateLength: function (facetValue) {
-			return this.getValue().length == facetValue;
+			return this.getNodeValue().length == facetValue;
 		}
 	});
 

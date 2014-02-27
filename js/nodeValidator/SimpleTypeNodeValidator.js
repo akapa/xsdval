@@ -22,14 +22,14 @@ function (_, objTools, xsd, NodeValidator, primitiveUnserializers,
 			));
 			return res;
 		},
-		getValue: function () {
+		getNodeValue: function () {
 			return xsd.getNodeText(this.node);
 		},
 		getXpathValue: function () {
-			return this.getValue();
+			return this.getNodeValue();
 		},
-		getRealValue: function (type, value) {
-			var v = value || this.getValue();
+		getTypedNodeValue: function (type, value) {
+			var v = value || this.getNodeValue();
 			return type in primitiveUnserializers 
 				? primitiveUnserializers[type](v)
 				: v;
@@ -49,9 +49,7 @@ function (_, objTools, xsd, NodeValidator, primitiveUnserializers,
 			var type = xsd.getTypeFromNodeAttr(this.definition, 'type');
 			var current, findings, facets, enums;
 			var validatedFacets = [];
-			while (current = type 
-				? this.xsdLibrary.findTypeDefinition(type.namespaceURI, type.name)
-				: this.definition[0]) {
+			while (current = this.validatorFactory.getXsdNode(this.definition, type)) {
 					facets = xsd.findRestrictingFacets(current);
 					enums = [];
 					findings = _(facets).map(_(function (elem) {
@@ -106,22 +104,22 @@ function (_, objTools, xsd, NodeValidator, primitiveUnserializers,
 			var r = _(facetValue).isRegExp() 
 				? facetValue 
 				: new RegExp(['^', facetValue, '$'].join(''));
-			return r.test(this.getValue());
+			return r.test(this.getNodeValue());
 		},
 		validateMaxInclusive: function (facetValue) {
-			return this.getRealValue(this.type) <= this.getRealValue(this.type, facetValue);
+			return this.getTypedNodeValue(this.type) <= this.getTypedNodeValue(this.type, facetValue);
 		},
 		validateMinInclusive: function (facetValue) {
-			return this.getRealValue(this.type) >= this.getRealValue(this.type, facetValue);
+			return this.getTypedNodeValue(this.type) >= this.getTypedNodeValue(this.type, facetValue);
 		},
 		validateMaxExclusive: function (facetValue) {
-			return this.getRealValue(this.type) < this.getRealValue(this.type, facetValue);
+			return this.getTypedNodeValue(this.type) < this.getTypedNodeValue(this.type, facetValue);
 		},
 		validateMinExclusive: function (facetValue) {
-			return this.getRealValue(this.type) > this.getRealValue(this.type, facetValue);
+			return this.getTypedNodeValue(this.type) > this.getTypedNodeValue(this.type, facetValue);
 		},
 		validateEnumeration: function (values) {
-			return values.indexOf(this.getValue()) !== -1;
+			return values.indexOf(this.getNodeValue()) !== -1;
 		},
 		validateAssertion: function (xpath) {
 			xpath = xpath.replace(/\$value/, this.getXpathValue());

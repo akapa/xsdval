@@ -1,5 +1,7 @@
-define(['xsdval/NodeValidatorFactory', 'xsdval/XsdLibrary', 'xsd'], 
-function (NodeValidatorFactory, XsdLibrary, xsd) {
+define(['xsdval/NodeValidatorFactory', 'xsdval/nodeValidator/ComplexTypeNodeValidator', 
+	'xsdval/nodeValidator/DecimalNodeValidator', 'xsdval/XsdLibrary', 'xsd'], 
+function (NodeValidatorFactory, ComplexTypeNodeValidator, DecimalNodeValidator, 
+	XsdLibrary, xsd) {
 
 	describe("NodeValidatorFactory", function() {
 
@@ -49,6 +51,52 @@ function (NodeValidatorFactory, XsdLibrary, xsd) {
 				elem.removeChild(st);
 				var res = nvf.getXsdNode(elem);
 				expect(res).toBe(null);
+
+			});
+
+		});
+
+		describe("getValidator", function () {
+
+			it("returns ComplexTypeNodeValidator for complexTypes, except when abstract", function() {
+
+				var st = schema.createElementNS(xsdns, 'xs:complexType');
+				elem.appendChild(st);
+
+				expect(nvf.getValidator(elem, null))
+					.toEqual(jasmine.any(ComplexTypeNodeValidator));
+
+				st.setAttribute('abstract', 'true');
+				expect(function () { nvf.getValidator(elem, null); }).toThrow();
+
+				elem.removeChild(st);
+
+			});
+
+			it("returns a kind of SimpleTypeNodeValidator for restricting simpleTypes", function() {
+
+				var st = schema.createElementNS(xsdns, 'xs:simpleType');
+				elem.appendChild(st);
+				var rest = schema.createElementNS(xsdns, 'xs:restriction');
+				rest.setAttribute('base', 'xs:integer');
+				st.appendChild(rest);
+
+				expect(nvf.getValidator(elem, null))
+					.toEqual(jasmine.any(DecimalNodeValidator));
+
+				elem.removeChild(st);
+
+			});
+
+			it("returns a kind of SimpleTypeNodeValidator for base types", function() {
+
+				var type = {
+					namespaceURI: xsdns,
+					name: 'decimal'
+				};
+
+				expect(nvf.getValidator(elem, null, type))
+					.toEqual(jasmine.any(DecimalNodeValidator));
 
 			});
 

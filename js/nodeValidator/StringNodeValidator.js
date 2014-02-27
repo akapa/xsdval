@@ -15,13 +15,13 @@ function (_, objTools, SimpleTypeNodeValidator, XmlValidationResult, XmlValidati
 			];
 		},
 		validateMaxLength: function (facetValue) {
-			return this.getValue().length <= facetValue;
+			return this.getNodeValue().length <= facetValue;
 		},
 		validateMinLength: function (facetValue) {
-			return this.getValue().length >= facetValue;
+			return this.getNodeValue().length >= facetValue;
 		},
 		validateLength: function (facetValue) {
-			return this.getValue().length == facetValue;
+			return this.getNodeValue().length == facetValue;
 		}
 	});
 

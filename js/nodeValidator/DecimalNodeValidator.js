@@ -23,10 +23,10 @@ function (_, objTools, SimpleTypeNodeValidator, XmlValidationResult, XmlValidati
 			];
 		},
 		validateTotalDigits: function (facetValue) {
-			return this.getValue().replace(/\D/g, '').length <= facetValue;
+			return this.getNodeValue().replace(/\D/g, '').length <= facetValue;
 		},
 		validateFractionDigits: function (facetValue) {
-			var v = this.getValue();
+			var v = this.getNodeValue();
 			var fracDigits = v.indexOf('.') === -1
 				? 0
 				: v.split('.')[1].length;

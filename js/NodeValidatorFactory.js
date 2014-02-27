@@ -37,7 +37,7 @@ function (_, objTools, xsd, NodeValidator, ComplexTypeNodeValidator, AnyTypeNode
 			}
 			//complex type
 			else if (xsdNode.namespaceURI === xsd.xs && xsdNode.localName === 'complexType') {
-				if (xsdNode.getAttribute('abstract') === true) {
+				if (xsdNode.getAttribute('abstract') === 'true') {
 					throw new TypeError('An abstract type should only be used for extension/restriction.');
 				}
 				return new ComplexTypeNodeValidator(node, xsdElement, this);
