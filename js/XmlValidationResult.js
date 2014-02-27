@@ -2,7 +2,7 @@ define(['underscore', 'objTools'], function (_, objTools) {
 
 	var xmlValidationResult = {
 		init: function (errors) {
-			this.errors = errors || [];
+			this.errors = errors ? [].concat(errors) : [];
 			this.checkSuccess();
 			return this;
 		},

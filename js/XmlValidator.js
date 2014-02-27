@@ -1,5 +1,6 @@
 define(['objTools', 'xsdval/XsdLibrary', 'xsdval/NodeValidatorFactory'],
 function (objTools, XsdLibrary, NodeValidatorFactory) {
+
 	var xmlValidator = {
 		init: function () {
 			this.xsdLibrary = new XsdLibrary();
@@ -16,7 +17,6 @@ function (objTools, XsdLibrary, NodeValidatorFactory) {
 				xmlNode.localName
 			);
 			var validator = this.nodeValidatorFactory.getValidator(definition, xmlNode);
-			console.log('Validating document with', validator);
 			return validator.validate();
 		}
 	};
@@ -25,4 +25,5 @@ function (objTools, XsdLibrary, NodeValidatorFactory) {
 		var obj = objTools.construct(xmlValidator, XmlValidator);
 		return obj.init.apply(obj, arguments);
 	};
+	
 });
