@@ -20,12 +20,10 @@ function (_, objTools, xsd, NodeValidator, ComplexTypeNodeValidator, AnyTypeNode
 		getValidator: function (xsdElement, node, type) {
 			//looking up a typeDefinition (complexType, simpleType or null)
 			type = type || xsd.getTypeFromNodeAttr(xsdElement, 'type');
-			var xsdNode = type
-				? this.xsdLibrary.findTypeDefinition(type.namespaceURI, type.name)
-				: xsdElement.children[0];
+			var xsdNode = this.getXsdNode(xsdElement, type);
 
 			//if it is a base simple type, choose a pre-defined validator
-			if (!xsdNode) {
+			if (xsdNode === null) {
 				if (type && type.namespaceURI === xsd.xs && type.name in strMappings) {
 					return new strMappings[type.name](node, xsdElement, this);
 				}
@@ -47,6 +45,12 @@ function (_, objTools, xsd, NodeValidator, ComplexTypeNodeValidator, AnyTypeNode
 
 			console.warn('No suitable validator found for "', xsdElement, '".');
 			return new NodeValidator(node, xsdElement, this);
+		},
+		getXsdNode: function (xsdElement, type) {
+			var node = type
+				? this.xsdLibrary.findTypeDefinition(type.namespaceURI, type.name)
+				: xsdElement.children[0];
+			return node || null;
 		}
 	};
 
