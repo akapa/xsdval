@@ -40,7 +40,9 @@ function (_, objTools, Library, xsd, basetypesXsd) {
 		},
 		findTypeDefinitionFromNodeAttr: function (node, typeAttr, typeAttrNS) {
 			var type = xsd.getTypeFromNodeAttr(node, typeAttr, typeAttrNS);
-			return this.findTypeDefinition(type.namespaceURI, type.name);
+			return type
+				? this.findTypeDefinition(type.namespaceURI, type.name)
+				: null;
 		},
 		findBaseTypeFor: function (node) {
 			var xsdNow = node;
@@ -59,18 +61,29 @@ function (_, objTools, Library, xsd, basetypesXsd) {
 	};
 });
 define('xsdval/XmlValidationResult',['underscore', 'objTools'], function (_, objTools) {
+
 	var xmlValidationResult = {
 		init: function (errors) {
-			errors = errors || [];
-			this.errors = errors;
-			this.success = errors.length === 0;
+			this.errors = errors ? [].concat(errors) : [];
+			this.checkSuccess();
 			return this;
+		},
+		add: function (errors) {
+			if (errors) {
+				this.errors = this.errors.concat(errors);
+				this.checkSuccess();
+			}
+		},
+		checkSuccess: function () {
+			this.success = this.errors.length === 0;
 		}
 	};
+
 	return function XmlValidationResult () {
 		var obj = objTools.construct(xmlValidationResult, XmlValidationResult);
 		return obj.init.apply(obj, arguments);
-	}
+	};
+
 });
 define('xsdval/nodeValidator/NodeValidator',['underscore', 'objTools', 'xsdval/XmlValidationResult'],
 function (_, objTools, XmlValidationResult) {
@@ -110,25 +123,31 @@ define('xsdval/XmlValidationError',['underscore', 'objTools'], function (_, objT
 define('xsdval/nodeValidator/ComplexTypeNodeValidator',['underscore', 'objTools', 'xsd', 'xsdval/nodeValidator/NodeValidator',
 	 'xsdval/XmlValidationResult', 'xsdval/XmlValidationError'],
 function (_, objTools, xsd, NodeValidator, XmlValidationResult, XmlValidationError) {
+
 	var complexTypeNodeValidator = objTools.make(NodeValidator, {
 		validate: function () {
-			var errors = [];
+			var res = new XmlValidationResult();
 
 			//check if the whole node is nil
 			if (this.node.getAttributeNS(xsd.xs, 'nil') === 'true') {
  				if (this.definition.getAttribute('nillable') !== 'true') {
- 					errors.push(new XmlValidationError(elem, this.definition, 'nillable'));
+ 					res.add(new XmlValidationError(elem, this.definition, 'nillable'));
 				}
 			}
 			else {
 				var typeDef = this.xsdLibrary.findTypeDefinitionFromNodeAttr(this.definition, 'type');
 				var xsdNow = this.getFirstElement(typeDef);
 				do {
-					errors = errors.concat(this.validateChild(xsdNow));
+					res.add(this.validateChild(xsdNow));
 				} while (xsdNow = this.getNextElement(xsdNow));
-			}
 
-			return new XmlValidationResult(errors);
+				//check assertions
+				var assert = typeDef.getElementsByTagNameNS(xsd.xs, 'assert');
+				if (assert.length) {
+					res.add(this.validateAssert(assert));
+				}
+			}
+			return res;
 		},
 		validateChild: function (xsdNow) {
 			var errors = [];
@@ -139,7 +158,7 @@ function (_, objTools, xsd, NodeValidator, XmlValidationResult, XmlValidationErr
 			});
 
 			//minOccurs, maxOccurs check
-			var occurLimit = this.parseMinMaxOccurs(xsdNow);
+			var occurLimit = xsd.parseMinMaxOccurs(xsdNow);
 			if (xmlNow.length > occurLimit.max) {
 				errors.push(new XmlValidationError(this.node, xsdNow, 'maxOccurs'));
 			}
@@ -195,38 +214,32 @@ function (_, objTools, xsd, NodeValidator, XmlValidationResult, XmlValidationErr
 			}
 			return next;
 		},
-		parseMinMaxOccurs: function (xsdNode) {
-			var min = xsdNode.getAttribute('minOccurs');
-			if (min === null || min === '') {
-				min = 1;
+		validateAssert: function (assertNodes) {
+			var errors = [];
+			var el, xpath, res;
+			for (var i = 0, l = assertNodes.length; i < l; i++) {
+				el = assertNodes[i];
+				xpath = el.getAttribute('test');
+				res =  document.evaluate(xpath, this.node, null, XPathResult.BOOLEAN_TYPE);
+				if (res.booleanValue === false) {
+					errors.push(new XmlValidationError(this.node, el, 'assert'));
+				}
 			}
-			else {
-				min = parseInt(min, 10);
-			}
-			var max = xsdNode.getAttribute('maxOccurs');
-			if (max === null || max === '') {
-				max = 1;
-			}
-			else if (max === 'unbounded') {
-				max = Infinity;
-			}
-			else {
-				max = parseInt(max, 10);
-			}
-			return { min: min, max: max	};
+			return errors;
 		}
 	});
 
 	return function ComplexTypeNodeValidator () {
 		var obj = objTools.construct(complexTypeNodeValidator, ComplexTypeNodeValidator);
 		return obj.init.apply(obj, arguments);
-	}
+	};
+	
 });
 define('xsdval/nodeValidator/AnyTypeNodeValidator',['underscore', 'objTools', 'xsd', 'xsdval/nodeValidator/NodeValidator',
 	'xsdval/XmlValidationResult', 'xsdval/XmlValidationError'],
 function (_, objTools, xsd, NodeValidator, XmlValidationResult, XmlValidationError) {
 	
-	var anyTypehNodeValidator = objTools.make(NodeValidator, {
+	var anyTypeNodeValidator = objTools.make(NodeValidator, {
 		type: 'anyType',
 		validate: function () {
 			var type = xsd.getTypeFromNodeAttr(this.node, 'type', xsd.xsi);
@@ -341,16 +354,19 @@ function (_, objTools, xsd, NodeValidator, primitiveUnserializers,
 			return _(extensions).pick(this.getAllowedFacets());
 		},
 		validate: function () {
-			var errors = [];
-			errors = errors.concat(
+			var res = new XmlValidationResult();
+			res.add([].concat(
 				this.validateBaseType(), 
 				this.validateBaseFacets(), 
 				this.validateFacets()
-			);
-			return new XmlValidationResult(errors);
+			));
+			return res;
 		},
 		getNodeValue: function () {
 			return xsd.getNodeText(this.node);
+		},
+		getXpathValue: function () {
+			return this.getNodeValue();
 		},
 		getTypedNodeValue: function (type, value) {
 			var v = value || this.getNodeValue();
@@ -373,9 +389,7 @@ function (_, objTools, xsd, NodeValidator, primitiveUnserializers,
 			var type = xsd.getTypeFromNodeAttr(this.definition, 'type');
 			var current, findings, facets, enums;
 			var validatedFacets = [];
-			while (current = type 
-				? this.xsdLibrary.findTypeDefinition(type.namespaceURI, type.name)
-				: this.definition[0]) {
+			while (current = this.validatorFactory.getXsdNode(this.definition, type)) {
 					facets = xsd.findRestrictingFacets(current);
 					enums = [];
 					findings = _(facets).map(_(function (elem) {
@@ -395,11 +409,12 @@ function (_, objTools, xsd, NodeValidator, primitiveUnserializers,
 		validateFacet: function (facetNode, validatedFacets) {
 			var enumMode = _(facetNode).isArray();
 			var facetName = enumMode ? facetNode[0].localName : facetNode.localName;
+			var valueAttr = facetName === 'assertion' ? 'test' : 'value';
 			var facetValue = enumMode 
 				? _(facetNode).map(function (elem) {
-						return elem.getAttribute('value');
+						return elem.getAttribute(valueAttr);
 					})
-				: facetNode.getAttribute('value');
+				: facetNode.getAttribute(valueAttr);
 			
 			if (this.getAllowedFacets().indexOf(facetName) === -1) {
 				return;
@@ -410,7 +425,9 @@ function (_, objTools, xsd, NodeValidator, primitiveUnserializers,
 				return;
 			}
 
-			validatedFacets.push(facetName);
+			if (facetName !== 'assertion') {
+				validatedFacets.push(facetName);
+			}
 			return this.invokeFacetValidation(facetName, facetValue, facetNode);
 		},
 		invokeFacetValidation: function (facetName, facetValue, facetNode) {
@@ -443,13 +460,18 @@ function (_, objTools, xsd, NodeValidator, primitiveUnserializers,
 		},
 		validateEnumeration: function (values) {
 			return values.indexOf(this.getNodeValue()) !== -1;
+		},
+		validateAssertion: function (xpath) {
+			xpath = xpath.replace(/\$value/, this.getXpathValue());
+			var res =  document.evaluate(xpath, this.node, null, XPathResult.BOOLEAN_TYPE);
+			return res.booleanValue;
 		}
 	});
 
 	return function SimpleTypeNodeValidator () {
 		var obj = objTools.construct(simpleTypeNodeValidator, SimpleTypeNodeValidator);
 		return obj.init.apply(obj, arguments);
-	}
+	};
 
 });
 define('xsdval/nodeValidator/FloatNodeValidator',['underscore', 'objTools', 'xsdval/nodeValidator/SimpleTypeNodeValidator',
@@ -471,7 +493,7 @@ function (_, objTools, SimpleTypeNodeValidator, XmlValidationResult, XmlValidati
 				'minInclusive',
 				'maxExclusive',
 				'minExclusive',
-				'assertions'
+				'assertion'
 			];
 		}
 	});
@@ -503,7 +525,7 @@ function (_, objTools, SimpleTypeNodeValidator, XmlValidationResult, XmlValidati
 				'maxExclusive',
 				'minInclusive',
 				'minExclusive',
-				'assertions'
+				'assertion'
 			];
 		},
 		validateTotalDigits: function (facetValue) {
@@ -538,7 +560,7 @@ function (_, objTools, SimpleTypeNodeValidator, XmlValidationResult, XmlValidati
 		getAllowedFacets: function () {
 			return [
 				'pattern', 
-				'assertions'
+				'assertion'
 			];
 		}
 	});
@@ -568,13 +590,124 @@ function (_, objTools, SimpleTypeNodeValidator, XmlValidationResult, XmlValidati
 				'minInclusive',
 				'maxExclusive',
 				'minExclusive',
-				'assertions'
+				'assertion'
 			];
 		}
 	});
 
 	return function DateTimeNodeValidator () {
 		var obj = objTools.construct(dateTimeNodeValidator, DateTimeNodeValidator);
+		return obj.init.apply(obj, arguments);
+	}
+
+});
+define('xsdval/nodeValidator/TimeNodeValidator',['underscore', 'objTools', 'xsdval/nodeValidator/SimpleTypeNodeValidator',
+	'xsdval/XmlValidationResult', 'xsdval/XmlValidationError'],
+function (_, objTools, SimpleTypeNodeValidator, XmlValidationResult, XmlValidationError) {
+	
+	var timeNodeValidator = objTools.make(SimpleTypeNodeValidator, {
+		type: 'time',
+		getBaseFacets: function () {
+			return {
+				'pattern': /^(([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](\.[0-9]+)?|(24:00:00(\.0+)?))(Z|(\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))?$/
+			};
+		},
+		getAllowedFacets: function () {
+			return [
+				'pattern', 
+				'enumeration',
+				'maxInclusive',
+				'minInclusive',
+				'maxExclusive',
+				'minExclusive',
+				'assertion'
+			];
+		}
+	});
+
+	return function TimeNodeValidator () {
+		var obj = objTools.construct(timeNodeValidator, TimeNodeValidator);
+		return obj.init.apply(obj, arguments);
+	}
+
+});
+define('xsdval/nodeValidator/DateNodeValidator',['underscore', 'objTools', 'xsdval/nodeValidator/SimpleTypeNodeValidator',
+	'xsdval/XmlValidationResult', 'xsdval/XmlValidationError'],
+function (_, objTools, SimpleTypeNodeValidator, XmlValidationResult, XmlValidationError) {
+	
+	var dateNodeValidator = objTools.make(SimpleTypeNodeValidator, {
+		type: 'date',
+		getBaseFacets: function () {
+			return {
+				'pattern': /^-?([1-9][0-9]{3,}|0[0-9]{3})-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])(Z|(\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))?$/
+			};
+		},
+		getAllowedFacets: function () {
+			return [
+				'pattern', 
+				'enumeration',
+				'maxInclusive',
+				'minInclusive',
+				'maxExclusive',
+				'minExclusive',
+				'assertion'
+			];
+		}
+	});
+
+	return function DateNodeValidator () {
+		var obj = objTools.construct(dateNodeValidator, DateNodeValidator);
+		return obj.init.apply(obj, arguments);
+	}
+
+});
+define('xsdval/nodeValidator/HexBinaryNodeValidator',['underscore', 'objTools', 'xsdval/nodeValidator/SimpleTypeNodeValidator',
+	'xsdval/XmlValidationResult', 'xsdval/XmlValidationError'],
+function (_, objTools, SimpleTypeNodeValidator, XmlValidationResult, XmlValidationError) {
+	
+	var hexBinaryNodeValidator = objTools.make(SimpleTypeNodeValidator, {
+		type: 'hexBinary',
+		getBaseFacets: function () {
+			return {
+				'pattern': /^([0-9a-fA-F]{2})*$/
+			};
+		},
+		getAllowedFacets: function () {
+			return [
+				'length',
+				'minLength',
+				'maxLength',
+				'pattern', 
+				'enumeration',
+				'assertion'
+			];
+		},
+		validateTotalDigits: function (facetValue) {
+			return this.getNodeValue().replace(/\D/g, '').length <= facetValue;
+		},
+		validateFractionDigits: function (facetValue) {
+			var v = this.getNodeValue();
+			var fracDigits = v.indexOf('.') === -1
+				? 0
+				: v.split('.')[1].length;
+			return fracDigits <= facetValue;
+		},
+		getNodeValueLength: function () {
+			return this.getNodeValue().length / 2;
+		},
+		validateMaxLength: function (facetValue) {
+			return this.getNodeValueLength() <= facetValue;
+		},
+		validateMinLength: function (facetValue) {
+			return this.getNodeValueLength() >= facetValue;
+		},
+		validateLength: function (facetValue) {
+			return this.getNodeValueLength() == facetValue;
+		}
+	});
+
+	return function HexBinaryNodeValidator () {
+		var obj = objTools.construct(hexBinaryNodeValidator, HexBinaryNodeValidator);
 		return obj.init.apply(obj, arguments);
 	}
 
@@ -592,7 +725,7 @@ function (_, objTools, SimpleTypeNodeValidator, XmlValidationResult, XmlValidati
 				'maxLength', 
 				'pattern', 
 				'enumeration', 
-				'assertions'
+				'assertion'
 			];
 		},
 		validateMaxLength: function (facetValue) {
@@ -620,11 +753,15 @@ define('xsdval/NodeValidatorFactory',['underscore', 'objTools', 'xsd',
 	'xsdval/nodeValidator/FloatNodeValidator',
 	'xsdval/nodeValidator/DecimalNodeValidator',
 	'xsdval/nodeValidator/BooleanNodeValidator',
-	'xsdval/nodeValidator/DateTimeNodeValidator', 
+	'xsdval/nodeValidator/DateTimeNodeValidator',
+	'xsdval/nodeValidator/TimeNodeValidator',
+	'xsdval/nodeValidator/DateNodeValidator',
+	'xsdval/nodeValidator/HexBinaryNodeValidator',
 	'xsdval/nodeValidator/StringNodeValidator'],
 function (_, objTools, xsd, NodeValidator, ComplexTypeNodeValidator, AnyTypeNodeValidator,
 	AnySimpleTypeNodeValidator, FloatNodeValidator, DecimalNodeValidator, 
-	BooleanNodeValidator, DateTimeNodeValidator, StringNodeValidator) {
+	BooleanNodeValidator, DateTimeNodeValidator, TimeNodeValidator, 
+	DateNodeValidator, HexBinaryNodeValidator, StringNodeValidator) {
 
 	var nodeValidatorFactory = {
 		init: function (xsdLibrary) {
@@ -634,12 +771,10 @@ function (_, objTools, xsd, NodeValidator, ComplexTypeNodeValidator, AnyTypeNode
 		getValidator: function (xsdElement, node, type) {
 			//looking up a typeDefinition (complexType, simpleType or null)
 			type = type || xsd.getTypeFromNodeAttr(xsdElement, 'type');
-			var xsdNode = type
-				? this.xsdLibrary.findTypeDefinition(type.namespaceURI, type.name)
-				: xsdElement.children[0];
+			var xsdNode = this.getXsdNode(xsdElement, type);
 
 			//if it is a base simple type, choose a pre-defined validator
-			if (!xsdNode) {
+			if (xsdNode === null) {
 				if (type && type.namespaceURI === xsd.xs && type.name in strMappings) {
 					return new strMappings[type.name](node, xsdElement, this);
 				}
@@ -653,7 +788,7 @@ function (_, objTools, xsd, NodeValidator, ComplexTypeNodeValidator, AnyTypeNode
 			}
 			//complex type
 			else if (xsdNode.namespaceURI === xsd.xs && xsdNode.localName === 'complexType') {
-				if (xsdNode.getAttribute('abstract') === true) {
+				if (xsdNode.getAttribute('abstract') === 'true') {
 					throw new TypeError('An abstract type should only be used for extension/restriction.');
 				}
 				return new ComplexTypeNodeValidator(node, xsdElement, this);
@@ -661,6 +796,12 @@ function (_, objTools, xsd, NodeValidator, ComplexTypeNodeValidator, AnyTypeNode
 
 			console.warn('No suitable validator found for "', xsdElement, '".');
 			return new NodeValidator(node, xsdElement, this);
+		},
+		getXsdNode: function (xsdElement, type) {
+			var node = type
+				? this.xsdLibrary.findTypeDefinition(type.namespaceURI, type.name)
+				: xsdElement.children[0];
+			return node || null;
 		}
 	};
 
@@ -672,6 +813,9 @@ function (_, objTools, xsd, NodeValidator, ComplexTypeNodeValidator, AnyTypeNode
 		'double': FloatNodeValidator,
 		'decimal': DecimalNodeValidator,
 		'dateTime': DateTimeNodeValidator,
+		'time': TimeNodeValidator,
+		'date': DateNodeValidator,
+		'hexBinary': HexBinaryNodeValidator,
 		'boolean': BooleanNodeValidator
 	};
 
@@ -683,6 +827,7 @@ function (_, objTools, xsd, NodeValidator, ComplexTypeNodeValidator, AnyTypeNode
 });
 define('xsdval/XmlValidator',['objTools', 'xsdval/XsdLibrary', 'xsdval/NodeValidatorFactory'],
 function (objTools, XsdLibrary, NodeValidatorFactory) {
+
 	var xmlValidator = {
 		init: function () {
 			this.xsdLibrary = new XsdLibrary();
@@ -699,7 +844,6 @@ function (objTools, XsdLibrary, NodeValidatorFactory) {
 				xmlNode.localName
 			);
 			var validator = this.nodeValidatorFactory.getValidator(definition, xmlNode);
-			console.log('Validating document with', validator);
 			return validator.validate();
 		}
 	};
@@ -708,8 +852,9 @@ function (objTools, XsdLibrary, NodeValidatorFactory) {
 		var obj = objTools.construct(xmlValidator, XmlValidator);
 		return obj.init.apply(obj, arguments);
 	};
+	
 });
-define('xsdvalidator',['xsdval/XmlValidator'], 
+define('xsdvalidator',['xsdval/XmlValidator', 'wgxpath'], 
 function (XmlValidator) {
 	return XmlValidator;
 });

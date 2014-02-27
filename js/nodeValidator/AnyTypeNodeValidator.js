@@ -2,7 +2,7 @@ define(['underscore', 'objTools', 'xsd', 'xsdval/nodeValidator/NodeValidator',
 	'xsdval/XmlValidationResult', 'xsdval/XmlValidationError'],
 function (_, objTools, xsd, NodeValidator, XmlValidationResult, XmlValidationError) {
 	
-	var anyTypehNodeValidator = objTools.make(NodeValidator, {
+	var anyTypeNodeValidator = objTools.make(NodeValidator, {
 		type: 'anyType',
 		validate: function () {
 			var type = xsd.getTypeFromNodeAttr(this.node, 'type', xsd.xsi);

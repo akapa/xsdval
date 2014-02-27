@@ -18,7 +18,7 @@ function (NodeValidatorFactory, ComplexTypeNodeValidator, DecimalNodeValidator,
 			nvf = new NodeValidatorFactory(new XsdLibrary([schema]));
 		});
 
-		describe("getXsdNode", function () {
+		describe("getXsdDefinition", function () {
 
 			it("calls xsdLibrary.findTypeDefinition() when type is given and returns node or null", function() {
 
@@ -29,14 +29,14 @@ function (NodeValidatorFactory, ComplexTypeNodeValidator, DecimalNodeValidator,
 
 				spyOn(nvf.xsdLibrary, 'findTypeDefinition').and.callThrough();
 				
-				var res = nvf.getXsdNode(elem, type);
+				var res = nvf.getXsdDefinition(elem, type);
 				
 				expect(nvf.xsdLibrary.findTypeDefinition)
 					.toHaveBeenCalledWith(type.namespaceURI, type.name);
 				expect(res.getAttribute('name')).toBe('integer');
 
 				type.name = 'notexistingtype';
-				var res2 = nvf.getXsdNode(elem, type);
+				var res2 = nvf.getXsdDefinition(elem, type);
 				expect(res2).toBe(null);
 
 			});
@@ -45,11 +45,11 @@ function (NodeValidatorFactory, ComplexTypeNodeValidator, DecimalNodeValidator,
 
 				var st = schema.createElementNS(xsdns, 'xs:simpleType');
 				elem.appendChild(st);
-				var res = nvf.getXsdNode(elem);
+				var res = nvf.getXsdDefinition(elem);
 				expect(res).toBe(st);
 
 				elem.removeChild(st);
-				var res = nvf.getXsdNode(elem);
+				var res = nvf.getXsdDefinition(elem);
 				expect(res).toBe(null);
 
 			});

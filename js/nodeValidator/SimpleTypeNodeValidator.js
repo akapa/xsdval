@@ -49,7 +49,7 @@ function (_, objTools, xsd, NodeValidator, primitiveUnserializers,
 			var type = xsd.getTypeFromNodeAttr(this.definition, 'type');
 			var current, findings, facets, enums;
 			var validatedFacets = [];
-			while (current = this.validatorFactory.getXsdNode(this.definition, type)) {
+			while (current = this.validatorFactory.getXsdDefinition(this.definition, type)) {
 					facets = xsd.findRestrictingFacets(current);
 					enums = [];
 					findings = _(facets).map(_(function (elem) {
