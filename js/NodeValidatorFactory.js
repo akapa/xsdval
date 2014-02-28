@@ -76,9 +76,9 @@ function (_, objTools, xsd, NodeValidator, ComplexTypeNodeValidator, AnyTypeNode
 		 * @returns {Element|null}
 		 */
 		getXsdDefinition: function (xsdElement, type) {
-			var node = type
-				? this.xsdLibrary.findTypeDefinition(type.namespaceURI, type.name)
-				: xsdElement.children[0];
+			var node = type ?
+				this.xsdLibrary.findTypeDefinition(type.namespaceURI, type.name) :
+				xsdElement.children[0];
 			return node || null;
 		}
 	};

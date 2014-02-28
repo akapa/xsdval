@@ -1,6 +1,11 @@
 define(['underscore', 'objTools', 'Library', 'xsd', 'text!xsdval/basetypes.xsd'],
 function (_, objTools, Library, xsd, basetypesXsd) {
 
+	/**
+	 * A basic library/collection used to store and retrieve items.
+	 * @external Library
+	 */
+
 	var xsdLibrary = objTools.make(Library, 
 	/**
 	 * @lends XsdLibrary.prototype
@@ -10,12 +15,12 @@ function (_, objTools, Library, xsd, basetypesXsd) {
 		 * @constructor XsdLibrary
 		 * @classdesc Stores XSD Documents and can do lookups in them.
 		 * @param {Document[]} defs - An array of XSD (XML) Document objects to store initially.
-		 * @extends Library
+		 * @extends external:Library
 		 */
 		init: function (defs) {
 			defs = defs || [];
 			var initDefs = [xsd.parseToDom(basetypesXsd)].concat(defs);
-			return (new Library).init.call(this, initDefs);
+			return new Library().init.call(this, initDefs);
 		},
 		/**
 		 * Adds an XSD Document to the library.
@@ -71,9 +76,7 @@ function (_, objTools, Library, xsd, basetypesXsd) {
 		 */
 		findTypeDefinitionFromNodeAttr: function (node, typeAttr, typeAttrNS) {
 			var type = xsd.getTypeFromNodeAttr(node, typeAttr, typeAttrNS);
-			return type
-				? this.findTypeDefinition(type.namespaceURI, type.name)
-				: null;
+			return type ? this.findTypeDefinition(type.namespaceURI, type.name) : null;
 		},
 		/**
 		 * Finds the base type for a simpleType definition. Follows inheritance until it reaches a base XSD type.

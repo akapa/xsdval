@@ -49,7 +49,7 @@ function (NodeValidatorFactory, ComplexTypeNodeValidator, DecimalNodeValidator,
 				expect(res).toBe(st);
 
 				elem.removeChild(st);
-				var res = nvf.getXsdDefinition(elem);
+				res = nvf.getXsdDefinition(elem);
 				expect(res).toBe(null);
 
 			});

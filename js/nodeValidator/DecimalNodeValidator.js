@@ -27,9 +27,7 @@ function (_, objTools, SimpleTypeNodeValidator, XmlValidationResult, XmlValidati
 		},
 		validateFractionDigits: function (facetValue) {
 			var v = this.getNodeValue();
-			var fracDigits = v.indexOf('.') === -1
-				? 0
-				: v.split('.')[1].length;
+			var fracDigits = (v.indexOf('.') === -1) ? 0 : v.split('.')[1].length;
 			return fracDigits <= facetValue;
 		}
 	});
@@ -37,6 +35,6 @@ function (_, objTools, SimpleTypeNodeValidator, XmlValidationResult, XmlValidati
 	return function DecimalNodeValidator () {
 		var obj = objTools.construct(decimalNodeValidator, DecimalNodeValidator);
 		return obj.init.apply(obj, arguments);
-	}
+	};
 
 });

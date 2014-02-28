@@ -5,13 +5,11 @@ define(['underscore'], function (_) {
 			return ['true', '1'].indexOf(s) !== -1;
 		},
 		'float': function (s) {
-			switch (s) {
-				case 'INF':
-					return Number.POSITIVE_INFINITY;
-				break;
-				case '-INF':
-					return Number.NEGATIVE_INFINITY;
-				break;
+			if (s === 'INF') {
+				return Number.POSITIVE_INFINITY;
+			}
+			if (s === '-INF') {
+				return Number.NEGATIVE_INFINITY;
 			}
 			return parseFloat(s);
 		},

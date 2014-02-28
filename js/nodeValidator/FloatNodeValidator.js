@@ -25,6 +25,6 @@ function (_, objTools, SimpleTypeNodeValidator, XmlValidationResult, XmlValidati
 	return function FloatNodeValidator () {
 		var obj = objTools.construct(floatNodeValidator, FloatNodeValidator);
 		return obj.init.apply(obj, arguments);
-	}
+	};
 
 });

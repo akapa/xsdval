@@ -31,6 +31,6 @@ function (_, objTools, XmlValidationResult) {
 	return function NodeValidator () {
 		var obj = objTools.construct(nodeValidator, NodeValidator);
 		return obj.init.apply(obj, arguments);
-	}
+	};
 
 });

@@ -1,5 +1,5 @@
 define(['underscore', 'objTools', 'xsdval/nodeValidator/SimpleTypeNodeValidator',
-	 'xsdval/XmlValidationResult', 'xsdval/XmlValidationError'],
+	'xsdval/XmlValidationResult', 'xsdval/XmlValidationError'],
 function (_, objTools, SimpleTypeNodeValidator, XmlValidationResult, XmlValidationError) {
 	
 	var stringNodeValidator = objTools.make(SimpleTypeNodeValidator, {
@@ -28,6 +28,6 @@ function (_, objTools, SimpleTypeNodeValidator, XmlValidationResult, XmlValidati
 	return function StringNodeValidator () {
 		var obj = objTools.construct(stringNodeValidator, StringNodeValidator);
 		return obj.init.apply(obj, arguments);
-	}
+	};
 
 });

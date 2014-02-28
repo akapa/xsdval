@@ -4,18 +4,39 @@ define('text!xsdval/basetypes.xsd',[],function () { return '<?xml version=\'1.0\
 define('xsdval/XsdLibrary',['underscore', 'objTools', 'Library', 'xsd', 'text!xsdval/basetypes.xsd'],
 function (_, objTools, Library, xsd, basetypesXsd) {
 
-	var xsdLibrary = objTools.make(Library, {
+	var xsdLibrary = objTools.make(Library, 
+	/**
+	 * @lends XsdLibrary.prototype
+	 */
+	{
+		/**
+		 * @constructor XsdLibrary
+		 * @classdesc Stores XSD Documents and can do lookups in them.
+		 * @param {Document[]} defs - An array of XSD (XML) Document objects to store initially.
+		 * @extends Library
+		 */
 		init: function (defs) {
 			defs = defs || [];
 			var initDefs = [xsd.parseToDom(basetypesXsd)].concat(defs);
 			return (new Library).init.call(this, initDefs);
 		},
+		/**
+		 * Adds an XSD Document to the library.
+		 * @param {Document} def - An XSD (XML) Document object.
+		 * @param {string} [name] - The namespace the XSD should be used to validate - read from the XSD's targetnamespace if not given.
+		 */	
 		addItem: function (def, name) {
 			var ns = name || def.documentElement.getAttributeNS(null, 'targetNamespace');
 			var xsdCollection = this.exists(ns)	? this.getItem(ns) : [];
 			xsdCollection.push(def);
 			this.items[ns] = xsdCollection;
 		},
+		/**
+		 * Finds an XSD root &lt;element&gt; in the library.
+		 * @param {string} namespace - The target namespace of the element (an XSD document will be chosen based on this).
+		 * @param {string} name - The node name of the element to be found.
+		 * @returns {Element|null}
+		 */	
 		findElement: function (namespace, name) {
 			var xsds = this.getItem(namespace) || [];
 			var element;
@@ -27,6 +48,12 @@ function (_, objTools, Library, xsd, basetypesXsd) {
 			}
 			return null;
 		},
+		/**
+		 * Finds an XSD type definition (complexType or simpleType) in the library.
+		 * @param {string} namespace - The namespace of the type definition (an XSD document will be chosen based on this).
+		 * @param {string} name - The name of the type to be found.
+		 * @returns {Element|null}
+		 */
 		findTypeDefinition: function (namespace, name) {
 			var xsds = this.getItem(namespace) || [];
 			var xsdNodes;
@@ -38,12 +65,24 @@ function (_, objTools, Library, xsd, basetypesXsd) {
 			}
 			return null;
 		},
+		/**
+		 * Finds the type definition based on the type read from specified attribute of the given element.
+		 * @param {Element} node - The element to read the attribute from.
+		 * @param {string} typeAttr - The name of the attribute that holds the type.
+		 * @param {string} [typeAttrNS] - The namespace of the attribute (if any) that holds the type.
+		 * @returns {Element|null}
+		 */
 		findTypeDefinitionFromNodeAttr: function (node, typeAttr, typeAttrNS) {
 			var type = xsd.getTypeFromNodeAttr(node, typeAttr, typeAttrNS);
 			return type
 				? this.findTypeDefinition(type.namespaceURI, type.name)
 				: null;
 		},
+		/**
+		 * Finds the base type for a simpleType definition. Follows inheritance until it reaches a base XSD type.
+		 * @param {Element} node - The type definition node to start from.
+		 * @returns {string} The name of the base type (like: string, decimal, dateTime, etc.).
+		 */
 		findBaseTypeFor: function (node) {
 			var xsdNow = node;
 			var basetype;
@@ -62,19 +101,42 @@ function (_, objTools, Library, xsd, basetypesXsd) {
 });
 define('xsdval/XmlValidationResult',['underscore', 'objTools'], function (_, objTools) {
 
+	/**
+	 * @lends XmlValidationResult.prototype
+	 */
 	var xmlValidationResult = {
+		/**
+		 * @constructor XmlValidationResult
+		 * @classdesc Stores validation errors and reports on success.
+		 * @param {XmlValidationError[]} errors - Errors added initially, success is validated based on this.
+		 */
 		init: function (errors) {
+			/**
+			 * The errors returned by the validation.
+			 * @member {XmlValidationError[]}
+			 */
 			this.errors = errors ? [].concat(errors) : [];
 			this.checkSuccess();
 			return this;
 		},
+		/**
+		 * Adds errors to the collection, success is revalidated.
+		 * @param {XmlValidationError[]} errors - Errors added.
+		 */
 		add: function (errors) {
 			if (errors) {
 				this.errors = this.errors.concat(errors);
 				this.checkSuccess();
 			}
 		},
+		/**
+		 * Checks the count of errors and sets success to true if it is zero. No need to call it when methods are used to manipulate the error collection.
+		 */
 		checkSuccess: function () {
+			/**
+			 * Can be read to check whether validation was a success (no errors) or not.
+			 * @member {boolean}
+			 */
 			this.success = this.errors.length === 0;
 		}
 	};
@@ -87,7 +149,18 @@ define('xsdval/XmlValidationResult',['underscore', 'objTools'], function (_, obj
 });
 define('xsdval/nodeValidator/NodeValidator',['underscore', 'objTools', 'xsdval/XmlValidationResult'],
 function (_, objTools, XmlValidationResult) {
+
+	/**
+	 * @lends NodeValidator.prototype
+	 */
 	var nodeValidator = {
+		/**
+		 * @constructor NodeValidator
+		 * @classdesc A dummy NodeValidator, always validates. Serves as a base for all other node validators.
+		 * @param {Element} node - The XML node validated by this validator.
+		 * @param {Element} definition - The XSD node to be used for validation by this validator.
+		 * @param {NodeValidatorFactory} [validatorFactory] - The validator factory that can be used to spawn further validators if needed.
+		 */
 		init: function (node, definition, validatorFactory) {
 			this.node = node;
 			this.definition = definition;
@@ -95,6 +168,10 @@ function (_, objTools, XmlValidationResult) {
 			this.xsdLibrary = validatorFactory ? validatorFactory.xsdLibrary : null;
 			return this;
 		},
+		/**
+		 * Validates the XML node against the XSD node.
+		 * @returns {XmlValidationResult}
+		 */
 		validate: function () {
 			return new XmlValidationResult();
 		}
@@ -104,12 +181,36 @@ function (_, objTools, XmlValidationResult) {
 		var obj = objTools.construct(nodeValidator, NodeValidator);
 		return obj.init.apply(obj, arguments);
 	}
+
 });
 define('xsdval/XmlValidationError',['underscore', 'objTools'], function (_, objTools) {
+
+	/**
+	 * @lends XmlValidationError.prototype
+	 */
 	var xmlValidationError = {
+		/**
+		 * @constructor XmlValidationError
+		 * @classdesc Provides information on a validation error.
+		 * @param {Element} failingNode - The XML node that failed validation.
+		 * @param {Element} failedXsdNode - The XSD node containing the validation rule that was not passed.
+		 * @param {string} type - A short non-standard hint on what type of validation rule was failed.
+		 */
 		init: function (failingNode, failedXsdNode, type) {
-			this.failingNode = failingNode || null;
-			this.failedXsdNode = failedXsdNode || null;
+			/**
+			 * The XML node that failed validation.
+			 * @member {Element}
+			 */
+			this.failingNode = failingNode;
+			/**
+			 * The XSD node containing the validation rule that was not passed.
+			 * @member {Element}
+			 */
+			this.failedXsdNode = failedXsdNode;
+			/**
+			 * A short non-standard hint on what type of validation rule was failed.
+			 * @member {type}
+			 */
 			this.type = type;
 			console.error('Validation error created:', this);
 			return this;
@@ -389,7 +490,7 @@ function (_, objTools, xsd, NodeValidator, primitiveUnserializers,
 			var type = xsd.getTypeFromNodeAttr(this.definition, 'type');
 			var current, findings, facets, enums;
 			var validatedFacets = [];
-			while (current = this.validatorFactory.getXsdNode(this.definition, type)) {
+			while (current = this.validatorFactory.getXsdDefinition(this.definition, type)) {
 					facets = xsd.findRestrictingFacets(current);
 					enums = [];
 					findings = _(facets).map(_(function (elem) {
@@ -763,15 +864,34 @@ function (_, objTools, xsd, NodeValidator, ComplexTypeNodeValidator, AnyTypeNode
 	BooleanNodeValidator, DateTimeNodeValidator, TimeNodeValidator, 
 	DateNodeValidator, HexBinaryNodeValidator, StringNodeValidator) {
 
+	/**
+	 * @lends NodeValidatorFactory.prototype
+	 */
 	var nodeValidatorFactory = {
+		/**
+		 * @constructor NodeValidatorFactory
+		 * @classdesc Can choose a NodeValidator qualified to validate a certain node.
+		 * @param {XsdLibrary} xsdLibrary - The XSD library used to resolve type definitions, inheritance, etc..
+		 */
 		init: function (xsdLibrary) {
+			/**
+			 * The validation library that contains XSD documents.
+			 * @member {XsdLibrary} NodeValidatorFactory#xsdLibrary
+			 */
 			this.xsdLibrary = xsdLibrary;
 			return this;
 		},
+		/**
+		 * Finds an appropriate NodeValidator object.
+		 * @param {Element} xsdElement - The XSD Element that should be used to validate the XML node.
+		 * @param {Element} node - The XML node that want to validate with the resulting validator.
+		 * @param {string} [type] - The type of the node can be overridden, by default an attempt will be made to resolve it based on the XSD node.
+		 * @returns {NodeValidator} A NodeValidator that is capable of validating the given node.
+		 */
 		getValidator: function (xsdElement, node, type) {
 			//looking up a typeDefinition (complexType, simpleType or null)
 			type = type || xsd.getTypeFromNodeAttr(xsdElement, 'type');
-			var xsdNode = this.getXsdNode(xsdElement, type);
+			var xsdNode = this.getXsdDefinition(xsdElement, type);
 
 			//if it is a base simple type, choose a pre-defined validator
 			if (xsdNode === null) {
@@ -797,7 +917,13 @@ function (_, objTools, xsd, NodeValidator, ComplexTypeNodeValidator, AnyTypeNode
 			console.warn('No suitable validator found for "', xsdElement, '".');
 			return new NodeValidator(node, xsdElement, this);
 		},
-		getXsdNode: function (xsdElement, type) {
+		/**
+		 * Attempts to find an XSD type definition either by the given type object, or embedded in the given XSD Element.
+		 * @param {Element} xsdElement - An XSD &lt;element&gt; node.
+		 * @param {{ namespaceURI: string, name: string }} type - A type object (namespaceURI and name).
+		 * @returns {Element|null}
+		 */
+		getXsdDefinition: function (xsdElement, type) {
 			var node = type
 				? this.xsdLibrary.findTypeDefinition(type.namespaceURI, type.name)
 				: xsdElement.children[0];
@@ -828,15 +954,39 @@ function (_, objTools, xsd, NodeValidator, ComplexTypeNodeValidator, AnyTypeNode
 define('xsdval/XmlValidator',['objTools', 'xsdval/XsdLibrary', 'xsdval/NodeValidatorFactory'],
 function (objTools, XsdLibrary, NodeValidatorFactory) {
 
+	/**
+	 * @lends XmlValidator.prototype
+	 */
 	var xmlValidator = {
+		/**
+		 * @constructor XmlValidator
+		 * @classdesc Can be used to validate an XML document/element against a set of XSD documents.
+		 */
 		init: function () {
+			/**
+			 * The validation library that contains XSD documents.
+			 * @member {XsdLibrary} XmlValidator#xsdLibrary
+			 */
 			this.xsdLibrary = new XsdLibrary();
+			/**
+			 * The factory used to get validator objects for certain types.
+			 * @member {NodeValidatorFactory} XmlValidator#nodeValidatorFactory
+			 */
 			this.nodeValidatorFactory = new NodeValidatorFactory(this.xsdLibrary);
 			return this;
 		},
+		/**
+		 * Loads an XSD document into the validation library.
+		 * @param {Document} xsdDocument - An XSD (XML) Document object.
+		 */
 		loadXsd: function (xsdDocument) {
 			this.xsdLibrary.addItem(xsdDocument);
 		},
+		/**
+		 * Validates an XML Document or Element against the validation library.
+		 * @param {Element|Document} xmlNode - An XML Document or Element that is to be validated.
+		 * @returns {XmlValidationResult}
+		 */
 		validate: function (xmlNode) {
 			xmlNode = xmlNode instanceof Document ? xmlNode.documentElement : xmlNode;
 			var definition = this.xsdLibrary.findElement(

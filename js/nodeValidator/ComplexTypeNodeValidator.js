@@ -1,5 +1,5 @@
 define(['underscore', 'objTools', 'xsd', 'xsdval/nodeValidator/NodeValidator',
-	 'xsdval/XmlValidationResult', 'xsdval/XmlValidationError'],
+	'xsdval/XmlValidationResult', 'xsdval/XmlValidationError'],
 function (_, objTools, xsd, NodeValidator, XmlValidationResult, XmlValidationError) {
 
 	var complexTypeNodeValidator = objTools.make(NodeValidator, {
@@ -8,8 +8,8 @@ function (_, objTools, xsd, NodeValidator, XmlValidationResult, XmlValidationErr
 
 			//check if the whole node is nil
 			if (this.node.getAttributeNS(xsd.xs, 'nil') === 'true') {
- 				if (this.definition.getAttribute('nillable') !== 'true') {
- 					res.add(new XmlValidationError(elem, this.definition, 'nillable'));
+				if (this.definition.getAttribute('nillable') !== 'true') {
+					res.add(new XmlValidationError(elem, this.definition, 'nillable'));
 				}
 			}
 			else {
@@ -17,7 +17,8 @@ function (_, objTools, xsd, NodeValidator, XmlValidationResult, XmlValidationErr
 				var xsdNow = this.getFirstElement(typeDef);
 				do {
 					res.add(this.validateChild(xsdNow));
-				} while (xsdNow = this.getNextElement(xsdNow));
+					xsdNow = this.getNextElement(xsdNow);
+				} while (xsdNow);
 
 				//check assertions
 				var assert = typeDef.getElementsByTagNameNS(xsd.xs, 'assert');
@@ -59,9 +60,9 @@ function (_, objTools, xsd, NodeValidator, XmlValidationResult, XmlValidationErr
 			_(xmlNodes).each(function (elem) {
 				//check for nil elements
 				if (elem.getAttributeNS(xsd.xsi, 'nil') === 'true') {
- 					if (!nillable) {
- 						errors.push(new XmlValidationError(elem, xsdNode, 'nillable'));
- 					}
+					if (!nillable) {
+						errors.push(new XmlValidationError(elem, xsdNode, 'nillable'));
+					}
 				}
 				else {
 					//running the chosen validator on the element

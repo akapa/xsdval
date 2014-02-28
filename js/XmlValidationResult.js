@@ -12,7 +12,8 @@ define(['underscore', 'objTools'], function (_, objTools) {
 		init: function (errors) {
 			/**
 			 * The errors returned by the validation.
-			 * @member {XmlValidationError[]}
+			 * @member {XmlValidationError[]} errors
+			 * @memberof XmlValidationResult#
 			 */
 			this.errors = errors ? [].concat(errors) : [];
 			this.checkSuccess();
@@ -30,11 +31,13 @@ define(['underscore', 'objTools'], function (_, objTools) {
 		},
 		/**
 		 * Checks the count of errors and sets success to true if it is zero. No need to call it when methods are used to manipulate the error collection.
+		 * @protected
 		 */
 		checkSuccess: function () {
 			/**
 			 * Can be read to check whether validation was a success (no errors) or not.
-			 * @member {boolean}
+			 * @member {boolean} success
+			 * @memberof XmlValidationResult#
 			 */
 			this.success = this.errors.length === 0;
 		}

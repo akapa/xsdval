@@ -20,6 +20,6 @@ function (_, objTools, xsd, NodeValidator, XmlValidationResult, XmlValidationErr
 	return function AnySimpleTypeNodeValidator () {
 		var obj = objTools.construct(anySimpleTypeNodeValidator, AnySimpleTypeNodeValidator);
 		return obj.init.apply(obj, arguments);
-	}
+	};
 
 });

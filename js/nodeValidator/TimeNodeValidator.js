@@ -25,6 +25,6 @@ function (_, objTools, SimpleTypeNodeValidator, XmlValidationResult, XmlValidati
 	return function TimeNodeValidator () {
 		var obj = objTools.construct(timeNodeValidator, TimeNodeValidator);
 		return obj.init.apply(obj, arguments);
-	}
+	};
 
 });

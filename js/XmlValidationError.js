@@ -14,17 +14,20 @@ define(['underscore', 'objTools'], function (_, objTools) {
 		init: function (failingNode, failedXsdNode, type) {
 			/**
 			 * The XML node that failed validation.
-			 * @member {Element}
+			 * @member {Element} failingNode
+			 * @memberof XmlValidationError#
 			 */
 			this.failingNode = failingNode;
 			/**
 			 * The XSD node containing the validation rule that was not passed.
-			 * @member {Element}
+			 * @member {Element} failedXsdNode
+			 * @memberof XmlValidationError#
 			 */
 			this.failedXsdNode = failedXsdNode;
 			/**
 			 * A short non-standard hint on what type of validation rule was failed.
-			 * @member {type}
+			 * @member {string} type
+			 * @memberof XmlValidationError#
 			 */
 			this.type = type;
 			console.error('Validation error created:', this);
@@ -34,5 +37,5 @@ define(['underscore', 'objTools'], function (_, objTools) {
 	return function XmlValidationError () {
 		var obj = objTools.construct(xmlValidationError, XmlValidationError);
 		return obj.init.apply(obj, arguments);
-	}
+	};
 });
