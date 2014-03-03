@@ -193,6 +193,7 @@ function (_, objTools, xsd, NodeValidator, primitiveUnserializers,
 		 * Used to validate by pattern (regex). Override if needed.
 		 * @param {string|RegExp} facetValue - The pattern.
 		 * @returns {boolean}
+		 * @protected
 		 */
 		validatePattern: function (facetValue) {
 			var r = _(facetValue).isRegExp() ? 
@@ -204,6 +205,7 @@ function (_, objTools, xsd, NodeValidator, primitiveUnserializers,
 		 * Used to validate maxInclusive. Override if needed.
 		 * @param {string} facetValue
 		 * @returns {boolean}
+		 * @protected
 		 */
 		validateMaxInclusive: function (facetValue) {
 			return this.getTypedNodeValue(this.type) <= this.getTypedNodeValue(this.type, facetValue);
@@ -212,6 +214,7 @@ function (_, objTools, xsd, NodeValidator, primitiveUnserializers,
 		 * Used to validate minInclusive. Override if needed.
 		 * @param {string} facetValue
 		 * @returns {boolean}
+		 * @protected
 		 */
 		validateMinInclusive: function (facetValue) {
 			return this.getTypedNodeValue(this.type) >= this.getTypedNodeValue(this.type, facetValue);
@@ -220,6 +223,7 @@ function (_, objTools, xsd, NodeValidator, primitiveUnserializers,
 		 * Used to validate maxExclusive. Override if needed.
 		 * @param {string} facetValue
 		 * @returns {boolean}
+		 * @protected
 		 */
 		validateMaxExclusive: function (facetValue) {
 			return this.getTypedNodeValue(this.type) < this.getTypedNodeValue(this.type, facetValue);
@@ -228,6 +232,7 @@ function (_, objTools, xsd, NodeValidator, primitiveUnserializers,
 		 * Used to validate minExclusive. Override if needed.
 		 * @param {string} facetValue
 		 * @returns {boolean}
+		 * @protected
 		 */
 		validateMinExclusive: function (facetValue) {
 			return this.getTypedNodeValue(this.type) > this.getTypedNodeValue(this.type, facetValue);
@@ -236,6 +241,7 @@ function (_, objTools, xsd, NodeValidator, primitiveUnserializers,
 		 * Used to validate enumeration. Override if needed.
 		 * @param {string[]} values
 		 * @returns {boolean}
+		 * @protected
 		 */
 		validateEnumeration: function (values) {
 			return values.indexOf(this.getNodeValue()) !== -1;
@@ -244,6 +250,7 @@ function (_, objTools, xsd, NodeValidator, primitiveUnserializers,
 		 * Used to validate assertion. Override if needed.
 		 * @param {string} xpath - An XPath expression. $value will be substituted with the result of [getXpathValue()]{@link SimpleTypeNodeValidator#getXpathValue}.
 		 * @returns {boolean}
+		 * @protected
 		 */
 		validateAssertion: function (xpath) {
 			xpath = xpath.replace(/\$value/, this.getXpathValue());
