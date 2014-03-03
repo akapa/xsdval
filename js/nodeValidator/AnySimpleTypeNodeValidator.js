@@ -21,7 +21,7 @@ function (_, objTools, xsd, NodeValidator, XmlValidationResult, XmlValidationErr
 		 * Fails validation if a complex type is given in the `type` attribute.
 		 * @returns {XmlValidationResult}
 		 */
- 		validate: function () {
+		validate: function () {
 			var type = xsd.getTypeFromNodeAttr(this.node, 'type', xsd.xsi);
 			var xsdNode = this.xsdLibrary.findTypeDefinition(type.namespaceURI, type.name);
 			if (xsdNode.namespaceURI === xsd.xs && xsdNode.localName === 'complexType') {

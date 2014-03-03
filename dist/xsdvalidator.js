@@ -4,6 +4,11 @@ define('text!xsdval/basetypes.xsd',[],function () { return '<?xml version=\'1.0\
 define('xsdval/XsdLibrary',['underscore', 'objTools', 'Library', 'xsd', 'text!xsdval/basetypes.xsd'],
 function (_, objTools, Library, xsd, basetypesXsd) {
 
+	/**
+	 * A basic library/collection used to store and retrieve items.
+	 * @external Library
+	 */
+
 	var xsdLibrary = objTools.make(Library, 
 	/**
 	 * @lends XsdLibrary.prototype
@@ -13,12 +18,12 @@ function (_, objTools, Library, xsd, basetypesXsd) {
 		 * @constructor XsdLibrary
 		 * @classdesc Stores XSD Documents and can do lookups in them.
 		 * @param {Document[]} defs - An array of XSD (XML) Document objects to store initially.
-		 * @extends Library
+		 * @extends external:Library
 		 */
 		init: function (defs) {
 			defs = defs || [];
 			var initDefs = [xsd.parseToDom(basetypesXsd)].concat(defs);
-			return (new Library).init.call(this, initDefs);
+			return new Library().init.call(this, initDefs);
 		},
 		/**
 		 * Adds an XSD Document to the library.
@@ -74,9 +79,7 @@ function (_, objTools, Library, xsd, basetypesXsd) {
 		 */
 		findTypeDefinitionFromNodeAttr: function (node, typeAttr, typeAttrNS) {
 			var type = xsd.getTypeFromNodeAttr(node, typeAttr, typeAttrNS);
-			return type
-				? this.findTypeDefinition(type.namespaceURI, type.name)
-				: null;
+			return type ? this.findTypeDefinition(type.namespaceURI, type.name) : null;
 		},
 		/**
 		 * Finds the base type for a simpleType definition. Follows inheritance until it reaches a base XSD type.
@@ -113,7 +116,8 @@ define('xsdval/XmlValidationResult',['underscore', 'objTools'], function (_, obj
 		init: function (errors) {
 			/**
 			 * The errors returned by the validation.
-			 * @member {XmlValidationError[]}
+			 * @member {XmlValidationError[]} errors
+			 * @memberof XmlValidationResult#
 			 */
 			this.errors = errors ? [].concat(errors) : [];
 			this.checkSuccess();
@@ -131,11 +135,13 @@ define('xsdval/XmlValidationResult',['underscore', 'objTools'], function (_, obj
 		},
 		/**
 		 * Checks the count of errors and sets success to true if it is zero. No need to call it when methods are used to manipulate the error collection.
+		 * @protected
 		 */
 		checkSuccess: function () {
 			/**
 			 * Can be read to check whether validation was a success (no errors) or not.
-			 * @member {boolean}
+			 * @member {boolean} success
+			 * @memberof XmlValidationResult#
 			 */
 			this.success = this.errors.length === 0;
 		}
@@ -180,7 +186,7 @@ function (_, objTools, XmlValidationResult) {
 	return function NodeValidator () {
 		var obj = objTools.construct(nodeValidator, NodeValidator);
 		return obj.init.apply(obj, arguments);
-	}
+	};
 
 });
 define('xsdval/XmlValidationError',['underscore', 'objTools'], function (_, objTools) {
@@ -199,17 +205,20 @@ define('xsdval/XmlValidationError',['underscore', 'objTools'], function (_, objT
 		init: function (failingNode, failedXsdNode, type) {
 			/**
 			 * The XML node that failed validation.
-			 * @member {Element}
+			 * @member {Element} failingNode
+			 * @memberof XmlValidationError#
 			 */
 			this.failingNode = failingNode;
 			/**
 			 * The XSD node containing the validation rule that was not passed.
-			 * @member {Element}
+			 * @member {Element} failedXsdNode
+			 * @memberof XmlValidationError#
 			 */
 			this.failedXsdNode = failedXsdNode;
 			/**
 			 * A short non-standard hint on what type of validation rule was failed.
-			 * @member {type}
+			 * @member {string} type
+			 * @memberof XmlValidationError#
 			 */
 			this.type = type;
 			console.error('Validation error created:', this);
@@ -219,20 +228,37 @@ define('xsdval/XmlValidationError',['underscore', 'objTools'], function (_, objT
 	return function XmlValidationError () {
 		var obj = objTools.construct(xmlValidationError, XmlValidationError);
 		return obj.init.apply(obj, arguments);
-	}
+	};
 });
 define('xsdval/nodeValidator/ComplexTypeNodeValidator',['underscore', 'objTools', 'xsd', 'xsdval/nodeValidator/NodeValidator',
-	 'xsdval/XmlValidationResult', 'xsdval/XmlValidationError'],
+	'xsdval/XmlValidationResult', 'xsdval/XmlValidationError'],
 function (_, objTools, xsd, NodeValidator, XmlValidationResult, XmlValidationError) {
 
-	var complexTypeNodeValidator = objTools.make(NodeValidator, {
+	/**
+	 * @constructor ComplexTypeNodeValidator
+	 * @classdesc A validator for complex types. Will spawn further validators for all the child elements.
+	 * @extends NodeValidator
+	 * @param {Element} node - The XML node validated by this validator.
+	 * @param {Element} definition - The XSD node to be used for validation by this validator.
+	 * @param {NodeValidatorFactory} validatorFactory - The validator factory that can be used to spawn further validators if needed.
+	 */
+	var complexTypeNodeValidator = objTools.make(NodeValidator, 
+	/**
+	 * @lends ComplexTypeNodeValidator.prototype
+	 */
+	{
+		/**
+		 * Validates the XML node against the XSD node.
+		 * Handles xsi:nil (and nillable), calls [validateChild()]{@link ComplexTypeNodeValidator#validateChild} for every child and handles assertions.
+		 * @returns {XmlValidationResult}
+		 */
 		validate: function () {
 			var res = new XmlValidationResult();
 
 			//check if the whole node is nil
 			if (this.node.getAttributeNS(xsd.xs, 'nil') === 'true') {
- 				if (this.definition.getAttribute('nillable') !== 'true') {
- 					res.add(new XmlValidationError(elem, this.definition, 'nillable'));
+				if (this.definition.getAttribute('nillable') !== 'true') {
+					res.add(new XmlValidationError(elem, this.definition, 'nillable'));
 				}
 			}
 			else {
@@ -240,7 +266,8 @@ function (_, objTools, xsd, NodeValidator, XmlValidationResult, XmlValidationErr
 				var xsdNow = this.getFirstElement(typeDef);
 				do {
 					res.add(this.validateChild(xsdNow));
-				} while (xsdNow = this.getNextElement(xsdNow));
+					xsdNow = this.getNextElement(xsdNow);
+				} while (xsdNow);
 
 				//check assertions
 				var assert = typeDef.getElementsByTagNameNS(xsd.xs, 'assert');
@@ -250,6 +277,13 @@ function (_, objTools, xsd, NodeValidator, XmlValidationResult, XmlValidationErr
 			}
 			return res;
 		},
+		/**
+		 * Used to validate a child node of the complex type element.
+		 * Validates minOccurs/maxOccurs and calls child validators.
+		 * @param {Element} xsdNow - The XSD node for the child element. Will look for the element(s) in the XML based on the XSD element name.
+		 * @returns {Array.<XmlValidationError>}
+		 * @protected
+		 */
 		validateChild: function (xsdNow) {
 			var errors = [];
 
@@ -273,6 +307,14 @@ function (_, objTools, xsd, NodeValidator, XmlValidationResult, XmlValidationErr
 			}
 			return errors;
 		},
+		/**
+		 * Used to validate the given node(s) based on the passed XSD node.
+		 * Uses the validator factory to spawn a fitting validator, calls it on all nodes and returns the results.
+		 * @param {Array.<Element>} xmlNodes - XML nodes of the same type that are to be validated based on the same XSD node.
+		 * @param {Element} xsdNode - The XSD node that contains validation information for the XML nodes.
+		 * @returns {Array.<XmlValidationError>}
+		 * @protected
+		 */
 		callChildValidators: function (xmlNodes, xsdNode) {
 			var errors = [];
 			//selecting the right validator for the job
@@ -282,9 +324,9 @@ function (_, objTools, xsd, NodeValidator, XmlValidationResult, XmlValidationErr
 			_(xmlNodes).each(function (elem) {
 				//check for nil elements
 				if (elem.getAttributeNS(xsd.xsi, 'nil') === 'true') {
- 					if (!nillable) {
- 						errors.push(new XmlValidationError(elem, xsdNode, 'nillable'));
- 					}
+					if (!nillable) {
+						errors.push(new XmlValidationError(elem, xsdNode, 'nillable'));
+					}
 				}
 				else {
 					//running the chosen validator on the element
@@ -297,10 +339,21 @@ function (_, objTools, xsd, NodeValidator, XmlValidationResult, XmlValidationErr
 			});
 			return errors;
 		},
+		/**
+		 * Used for iteration on the XSD child elements. Will return the first element to be evaluated.
+		 * @returns {Element|null}
+		 * @protected
+		 */
 		getFirstElement: function (xsdNode) {
 			var elems = xsdNode.getElementsByTagNameNS(xsdNode.namespaceURI, 'element');
 			return elems.length ? elems[0] : null;
 		},
+		/**
+		 * Used for iteration on the XSD child elements. Will return the next element to be evaluated after the given element.
+		 * Handles "extension" based inheritance. Advances to the next level of inheritance when there are no elements left on the current level.
+		 * @returns {Element|null}
+		 * @protected
+		 */
 		getNextElement: function (childCurrent) {
 			var next = childCurrent.nextElementSibling;
 			//if there are no more elements, let's get to possible extended defs
@@ -315,6 +368,12 @@ function (_, objTools, xsd, NodeValidator, XmlValidationResult, XmlValidationErr
 			}
 			return next;
 		},
+		/**
+		 * Used to run XPath-based assertions on the complex type element.
+		 * @param {Array.<Element>} assertNodes - &lt;assert&gt; nodes to use for validation.
+		 * @returns {Array.<XmlValidationError>}
+		 * @protected
+		 */
 		validateAssert: function (assertNodes) {
 			var errors = [];
 			var el, xpath, res;
@@ -340,8 +399,24 @@ define('xsdval/nodeValidator/AnyTypeNodeValidator',['underscore', 'objTools', 'x
 	'xsdval/XmlValidationResult', 'xsdval/XmlValidationError'],
 function (_, objTools, xsd, NodeValidator, XmlValidationResult, XmlValidationError) {
 	
-	var anyTypeNodeValidator = objTools.make(NodeValidator, {
+	/**
+	 * @constructor AnyTypeNodeValidator
+	 * @classdesc A validator for an element marked `anyType`.
+	 * @extends NodeValidator
+	 * @param {Element} node - The XML node validated by this validator.
+	 * @param {Element} definition - The XSD node to be used for validation by this validator.
+	 * @param {NodeValidatorFactory} validatorFactory - The validator factory that can be used to spawn further validators if needed.
+	 */	
+	var anyTypeNodeValidator = objTools.make(NodeValidator, 
+	/**
+	 * @lends AnyTypeNodeValidator.prototype
+	 */	
+	{
 		type: 'anyType',
+		/**
+		 * Checks the `type` attribute for the real type of the element, spawns and runs the fitting validator.
+		 * @returns {XmlValidationResult}
+		 */
 		validate: function () {
 			var type = xsd.getTypeFromNodeAttr(this.node, 'type', xsd.xsi);
 			var validator = this.validatorFactory.getValidator(typeDef, this.node, type);
@@ -352,15 +427,32 @@ function (_, objTools, xsd, NodeValidator, XmlValidationResult, XmlValidationErr
 	return function AnyTypeNodeValidator () {
 		var obj = objTools.construct(anyTypeNodeValidator, AnyTypeNodeValidator);
 		return obj.init.apply(obj, arguments);
-	}
+	};
 
 });
 define('xsdval/nodeValidator/AnySimpleTypeNodeValidator',['underscore', 'objTools', 'xsd', 'xsdval/nodeValidator/NodeValidator',
 	'xsdval/XmlValidationResult', 'xsdval/XmlValidationError'],
 function (_, objTools, xsd, NodeValidator, XmlValidationResult, XmlValidationError) {
 	
-	var anySimpleTypeNodeValidator = objTools.make(NodeValidator, {
+	/**
+	 * @constructor AnySimpleTypeNodeValidator
+	 * @classdesc A validator for an element marked `anySimpleType`.
+	 * @extends NodeValidator
+	 * @param {Element} node - The XML node validated by this validator.
+	 * @param {Element} definition - The XSD node to be used for validation by this validator.
+	 * @param {NodeValidatorFactory} validatorFactory - The validator factory that can be used to spawn further validators if needed.
+	 */	
+	var anySimpleTypeNodeValidator = objTools.make(NodeValidator, 
+	/**
+	 * @lends AnySimpleTypeNodeValidator.prototype
+	 */
+		{
 		type: 'anySimpleType',
+		/**
+		 * Checks the `type` attribute for the real type of the element, spawns and runs the fitting validator.
+		 * Fails validation if a complex type is given in the `type` attribute.
+		 * @returns {XmlValidationResult}
+		 */
 		validate: function () {
 			var type = xsd.getTypeFromNodeAttr(this.node, 'type', xsd.xsi);
 			var xsdNode = this.xsdLibrary.findTypeDefinition(type.namespaceURI, type.name);
@@ -377,7 +469,7 @@ function (_, objTools, xsd, NodeValidator, XmlValidationResult, XmlValidationErr
 	return function AnySimpleTypeNodeValidator () {
 		var obj = objTools.construct(anySimpleTypeNodeValidator, AnySimpleTypeNodeValidator);
 		return obj.init.apply(obj, arguments);
-	}
+	};
 
 });
 define('xsdval/primitiveUnserializers',['underscore'], function (_) {
@@ -387,13 +479,11 @@ define('xsdval/primitiveUnserializers',['underscore'], function (_) {
 			return ['true', '1'].indexOf(s) !== -1;
 		},
 		'float': function (s) {
-			switch (s) {
-				case 'INF':
-					return Number.POSITIVE_INFINITY;
-				break;
-				case '-INF':
-					return Number.NEGATIVE_INFINITY;
-				break;
+			if (s === 'INF') {
+				return Number.POSITIVE_INFINITY;
+			}
+			if (s === '-INF') {
+				return Number.NEGATIVE_INFINITY;
 			}
 			return parseFloat(s);
 		},
@@ -444,16 +534,57 @@ define('xsdval/nodeValidator/SimpleTypeNodeValidator',['underscore', 'objTools',
 function (_, objTools, xsd, NodeValidator, primitiveUnserializers,
 	XmlValidationResult, XmlValidationError) {
 	
-	var simpleTypeNodeValidator = objTools.make(NodeValidator, {
+	/**
+	 * @constructor SimpleTypeNodeValidator
+	 * @classdesc Serves as a base for node validators that validate simple types.
+	 * @extends NodeValidator
+	 * @abstract
+	 * @param {Element} node - The XML node validated by this validator.
+	 * @param {Element} definition - The XSD node to be used for validation by this validator.
+	 * @param {NodeValidatorFactory} validatorFactory - The validator factory that can be used to spawn further validators if needed.
+	 */
+	var simpleTypeNodeValidator = objTools.make(NodeValidator, 
+	/**
+	 * @lends SimpleTypeNodeValidator.prototype
+	 */
+	{
+		/**
+		 * Must be overridden to specify the type this validator can be used to validate.
+		 * For example 'string', 'anyType', 'dateTime', etc.
+		 * @member {string} type
+		 * @memberof SimpleTypeNodeValidator#
+		 * @protected
+		 */		
+		type: '',
+		/**
+		 * Get the base facets used by this validator. Derived node validators should override this method and add their own base facets.
+		 * @returns {Object.<string, *>}
+		 * @protected
+		 */
 		getBaseFacets: function () {
 			return {};
 		},
+		/**
+		 * Get the facets that are allowed to be used by this validator. Derived node validators should override this method and add their own allowed facets.
+		 * @returns {string[]}
+		 * @protected
+		 */
 		getAllowedFacets: function () {
 			return [];
 		},
+		/**
+		 * Receives a map of facets and returns only those that are allowed to be used by this validator.
+		 * @param {Object.<string, *>} extensions - The facets you want to filter.
+		 * @returns {Object.<string, *>} The filtered facets that are allowed to be used.
+		 * @protected
+		 */
 		getFacets: function (extensions) {
 			return _(extensions).pick(this.getAllowedFacets());
 		},
+		/**
+		 * Validates the XML node against the XSD node. Validates by base type, base facets and facets given in the XSD node.
+		 * @returns {XmlValidationResult}
+		 */
 		validate: function () {
 			var res = new XmlValidationResult();
 			res.add([].concat(
@@ -463,21 +594,53 @@ function (_, objTools, xsd, NodeValidator, primitiveUnserializers,
 			));
 			return res;
 		},
+		/**
+		 * Gets the plain XML string value of the node.
+		 * Used for validations where the XML string representation needs to be checked.
+		 * @returns {string}
+		 * @protected
+		 */
 		getNodeValue: function () {
 			return xsd.getNodeText(this.node);
 		},
+		/**
+		 * Gets the value of the node in a way that can be used correctly by XPath. 
+		 * Used for XPath based facet validation.
+		 * Can be safely overridden in case XPath will have problems with the plain XML representation of certain datatypes.
+		 * @returns {string}
+		 * @protected
+		 */
 		getXpathValue: function () {
 			return this.getNodeValue();
 		},
+		/**
+		 * Computes the real typed value of the XML string representation. 
+		 * Used to validate facets that are based on the real value, not the string representation.
+		 * @param {string} type - The XSD base type to be used.
+		 * @param {string} [value] - If given, this will be used instead of the value read from the XML node.
+		 * @returns {*}
+		 * @protected
+		 */
 		getTypedNodeValue: function (type, value) {
 			var v = value || this.getNodeValue();
-			return type in primitiveUnserializers 
-				? primitiveUnserializers[type](v)
-				: v;
+			return (type in primitiveUnserializers)	?
+				primitiveUnserializers[type](v) : 
+				v;
 		},
+		/**
+		 * Can be ovverridden to run special validations for a certain data type.
+		 * @returns {Array.<XmlValidationError>}
+		 * @protected
+		 */
 		validateBaseType: function () {
 			return [];
 		},
+		/**
+		 * Runs the validation for the base facets defined in the node validator.
+		 * Override [getBaseFacets()]{@link SimpleTypeNodeValidator#getBaseFacets} to provide base facets.
+		 * @returns {Array.<XmlValidationError>}
+		 * @protected
+		 */
 		validateBaseFacets: function () {
 			var findings = _(this.getBaseFacets())
 				.map(_(function (value, name) { 
@@ -485,37 +648,53 @@ function (_, objTools, xsd, NodeValidator, primitiveUnserializers,
 				}).bind(this));
 			return _(findings).compact();
 		},
+		/**
+		 * Runs the validation for facets defined in the XSD definition.
+		 * Takes inherited facets into account, travelling up the tree.
+		 * @returns {Array.<XmlValidationError>}
+		 * @protected
+		 */
 		validateFacets: function () {
 			var errors = [];	
 			var type = xsd.getTypeFromNodeAttr(this.definition, 'type');
-			var current, findings, facets, enums;
+			var current = this.validatorFactory.getXsdDefinition(this.definition, type);
+			var findings, facets, enums;
 			var validatedFacets = [];
-			while (current = this.validatorFactory.getXsdDefinition(this.definition, type)) {
-					facets = xsd.findRestrictingFacets(current);
-					enums = [];
-					findings = _(facets).map(_(function (elem) {
-						if (elem.localName === 'enumeration') {
-							enums.push(elem);
-						}
-						else return this.validateFacet(elem, validatedFacets);
-					}).bind(this));
-					if (enums.length) {
-						findings.push(this.validateFacet(enums, validatedFacets));
-					}
-					errors = errors.concat(_(findings).compact());
-					type = xsd.getRestrictedType(current);
+			var facetMapper = _(function (elem) {
+				if (elem.localName === 'enumeration') {
+					enums.push(elem);
+				}
+				else return this.validateFacet(elem, validatedFacets);
+			}).bind(this);
+			while (current) {
+				facets = xsd.findRestrictingFacets(current);
+				enums = [];
+				findings = _(facets).map(facetMapper);
+				if (enums.length) {
+					findings.push(this.validateFacet(enums, validatedFacets));
+				}
+				errors = errors.concat(_(findings).compact());
+				type = xsd.getRestrictedType(current);
+				current = this.validatorFactory.getXsdDefinition(this.definition, type);
 			}
 			return errors;
 		},
+		/**
+		 * Used to run validation defined by a certain facet node.
+		 * @param {Element|Array.<Element>} facetNode - The facet node to base validation on. In the case of an enumeration,  all the enumeration facet nodes should be passed as an array.
+		 * @param {string[]} validatedFacets - Facet types not to be validated. There are two exceptions: assertion facets and facet nodes having a "fixed" attribute, these will be processed anyways. This parameter is used to prevent processing facets that were overridden by a derived type definition.
+		 * @returns {XmlValidationError|undefined}
+		 * @protected
+		 */
 		validateFacet: function (facetNode, validatedFacets) {
 			var enumMode = _(facetNode).isArray();
 			var facetName = enumMode ? facetNode[0].localName : facetNode.localName;
 			var valueAttr = facetName === 'assertion' ? 'test' : 'value';
-			var facetValue = enumMode 
-				? _(facetNode).map(function (elem) {
-						return elem.getAttribute(valueAttr);
-					})
-				: facetNode.getAttribute(valueAttr);
+			var facetValue = enumMode ? 
+				_(facetNode).map(function (elem) {
+					return elem.getAttribute(valueAttr);
+				}) :
+				facetNode.getAttribute(valueAttr);
 			
 			if (this.getAllowedFacets().indexOf(facetName) === -1) {
 				return;
@@ -531,6 +710,14 @@ function (_, objTools, xsd, NodeValidator, primitiveUnserializers,
 			}
 			return this.invokeFacetValidation(facetName, facetValue, facetNode);
 		},
+		/**
+		 * Invokes the right facet validation method for the given facet type.
+		 * @param {string} facetName - The name of the facet.
+		 * @param {string|string[]} facetValue - The value of the facet (array is used for enumeration).
+		 * @param {Element} [facetNode] - The facet node (used for error reporting purposes only).
+		 * @returns {XmlValidationError|undefined}
+		 * @protected
+		 */
 		invokeFacetValidation: function (facetName, facetValue, facetNode) {
 			var method = 'validate' + facetName[0].toUpperCase() + facetName.slice(1);
 			var text = facetNode ? facetName : 'baseType';
@@ -541,27 +728,69 @@ function (_, objTools, xsd, NodeValidator, primitiveUnserializers,
 				}
 			}
 		},
+		/**
+		 * Used to validate by pattern (regex). Override if needed.
+		 * @param {string|RegExp} facetValue - The pattern.
+		 * @returns {boolean}
+		 * @protected
+		 */
 		validatePattern: function (facetValue) {
-			var r = _(facetValue).isRegExp() 
-				? facetValue 
-				: new RegExp(['^', facetValue, '$'].join(''));
+			var r = _(facetValue).isRegExp() ? 
+				facetValue :
+				new RegExp(['^', facetValue, '$'].join(''));
 			return r.test(this.getNodeValue());
 		},
+		/**
+		 * Used to validate maxInclusive. Override if needed.
+		 * @param {string} facetValue
+		 * @returns {boolean}
+		 * @protected
+		 */
 		validateMaxInclusive: function (facetValue) {
 			return this.getTypedNodeValue(this.type) <= this.getTypedNodeValue(this.type, facetValue);
 		},
+		/**
+		 * Used to validate minInclusive. Override if needed.
+		 * @param {string} facetValue
+		 * @returns {boolean}
+		 * @protected
+		 */
 		validateMinInclusive: function (facetValue) {
 			return this.getTypedNodeValue(this.type) >= this.getTypedNodeValue(this.type, facetValue);
 		},
+		/**
+		 * Used to validate maxExclusive. Override if needed.
+		 * @param {string} facetValue
+		 * @returns {boolean}
+		 * @protected
+		 */
 		validateMaxExclusive: function (facetValue) {
 			return this.getTypedNodeValue(this.type) < this.getTypedNodeValue(this.type, facetValue);
 		},
+		/**
+		 * Used to validate minExclusive. Override if needed.
+		 * @param {string} facetValue
+		 * @returns {boolean}
+		 * @protected
+		 */
 		validateMinExclusive: function (facetValue) {
 			return this.getTypedNodeValue(this.type) > this.getTypedNodeValue(this.type, facetValue);
 		},
+		/**
+		 * Used to validate enumeration. Override if needed.
+		 * @param {string[]} values
+		 * @returns {boolean}
+		 * @protected
+		 */
 		validateEnumeration: function (values) {
 			return values.indexOf(this.getNodeValue()) !== -1;
 		},
+		/**
+		 * Used to validate assertion. Override if needed.
+		 * @param {string} xpath - An XPath expression. $value will be substituted with the result of [getXpathValue()]{@link SimpleTypeNodeValidator#getXpathValue}.
+		 * @returns {boolean}
+		 * @protected
+		 */
 		validateAssertion: function (xpath) {
 			xpath = xpath.replace(/\$value/, this.getXpathValue());
 			var res =  document.evaluate(xpath, this.node, null, XPathResult.BOOLEAN_TYPE);
@@ -579,13 +808,35 @@ define('xsdval/nodeValidator/FloatNodeValidator',['underscore', 'objTools', 'xsd
 	'xsdval/XmlValidationResult', 'xsdval/XmlValidationError'],
 function (_, objTools, SimpleTypeNodeValidator, XmlValidationResult, XmlValidationError) {
 	
-	var floatNodeValidator = objTools.make(SimpleTypeNodeValidator, {
+	/**
+	 * @constructor FloatNodeValidator
+	 * @classdesc Validates simple type nodes whose base type is `float`.
+	 * @extends SimpleTypeNodeValidator
+	 * @param {Element} node - The XML node validated by this validator.
+	 * @param {Element} definition - The XSD node to be used for validation by this validator.
+	 * @param {NodeValidatorFactory} validatorFactory - The validator factory that can be used to spawn further validators if needed.
+	 */
+	var floatNodeValidator = objTools.make(SimpleTypeNodeValidator, 
+	/**
+	 * @lends FloatNodeValidator.prototype
+	 */
+	{
 		type: 'float',
+		/**
+		 * Get the base facets used by this validator.
+		 * @returns {Object.<string, *>}
+		 * @protected
+		 */
 		getBaseFacets: function () {
 			return {
 				'pattern': /^(\+|-)?([0-9]+(\.[0-9]*)?|\.[0-9]+)([Ee](\+|-)?[0-9]+)?|(\+|-)?INF|NaN$/
 			};
 		},
+		/**
+		 * Get the facets that are allowed to be used by this validator.
+		 * @returns {string[]}
+		 * @protected
+		 */
 		getAllowedFacets: function () {
 			return [
 				'pattern', 
@@ -602,20 +853,42 @@ function (_, objTools, SimpleTypeNodeValidator, XmlValidationResult, XmlValidati
 	return function FloatNodeValidator () {
 		var obj = objTools.construct(floatNodeValidator, FloatNodeValidator);
 		return obj.init.apply(obj, arguments);
-	}
+	};
 
 });
 define('xsdval/nodeValidator/DecimalNodeValidator',['underscore', 'objTools', 'xsdval/nodeValidator/SimpleTypeNodeValidator',
 	'xsdval/XmlValidationResult', 'xsdval/XmlValidationError'],
 function (_, objTools, SimpleTypeNodeValidator, XmlValidationResult, XmlValidationError) {
 	
-	var decimalNodeValidator = objTools.make(SimpleTypeNodeValidator, {
+	/**
+	 * @constructor DecimalNodeValidator
+	 * @classdesc Validates simple type nodes whose base type is `decimal`.
+	 * @extends SimpleTypeNodeValidator
+	 * @param {Element} node - The XML node validated by this validator.
+	 * @param {Element} definition - The XSD node to be used for validation by this validator.
+	 * @param {NodeValidatorFactory} validatorFactory - The validator factory that can be used to spawn further validators if needed.
+	 */
+	var decimalNodeValidator = objTools.make(SimpleTypeNodeValidator, 
+	/**
+	 * @lends DecimalNodeValidator.prototype
+	 */
+	{
 		type: 'decimal',
+		/**
+		 * Get the base facets used by this validator.
+		 * @returns {Object.<string, *>}
+		 * @protected
+		 */
 		getBaseFacets: function () {
 			return {
 				'pattern': /^(\+|-)?([0-9]+(\.[0-9]*)?|\.[0-9]+)$/
 			};
 		},
+		/**
+		 * Get the facets that are allowed to be used by this validator.
+		 * @returns {string[]}
+		 * @protected
+		 */
 		getAllowedFacets: function () {
 			return [
 				'totalDigits',
@@ -629,14 +902,24 @@ function (_, objTools, SimpleTypeNodeValidator, XmlValidationResult, XmlValidati
 				'assertion'
 			];
 		},
+		/**
+		 * Validates the `totalDigits` facet.
+		 * @param {string} facetValue
+		 * @returns {boolean}
+		 * @protected
+		 */
 		validateTotalDigits: function (facetValue) {
 			return this.getNodeValue().replace(/\D/g, '').length <= facetValue;
 		},
+		/**
+		 * Validates the `fractionDigits` facet.
+		 * @param {string} facetValue
+		 * @returns {boolean}
+		 * @protected
+		 */
 		validateFractionDigits: function (facetValue) {
 			var v = this.getNodeValue();
-			var fracDigits = v.indexOf('.') === -1
-				? 0
-				: v.split('.')[1].length;
+			var fracDigits = (v.indexOf('.') === -1) ? 0 : v.split('.')[1].length;
 			return fracDigits <= facetValue;
 		}
 	});
@@ -644,20 +927,42 @@ function (_, objTools, SimpleTypeNodeValidator, XmlValidationResult, XmlValidati
 	return function DecimalNodeValidator () {
 		var obj = objTools.construct(decimalNodeValidator, DecimalNodeValidator);
 		return obj.init.apply(obj, arguments);
-	}
+	};
 
 });
 define('xsdval/nodeValidator/BooleanNodeValidator',['underscore', 'objTools', 'xsdval/nodeValidator/SimpleTypeNodeValidator',
 	'xsdval/XmlValidationResult', 'xsdval/XmlValidationError'],
 function (_, objTools, SimpleTypeNodeValidator, XmlValidationResult, XmlValidationError) {
 	
-	var booleanNodeValidator = objTools.make(SimpleTypeNodeValidator, {
+	/**
+	 * @constructor BooleanNodeValidator
+	 * @classdesc Validates simple type nodes whose base type is `boolean`.
+	 * @extends SimpleTypeNodeValidator
+	 * @param {Element} node - The XML node validated by this validator.
+	 * @param {Element} definition - The XSD node to be used for validation by this validator.
+	 * @param {NodeValidatorFactory} validatorFactory - The validator factory that can be used to spawn further validators if needed.
+	 */
+	var booleanNodeValidator = objTools.make(SimpleTypeNodeValidator, 
+	/**
+	 * @lends BooleanNodeValidator.prototype
+	 */
+	{
 		type: 'boolean',
+		/**
+		 * Get the base facets used by this validator.
+		 * @returns {Object.<string, *>}
+		 * @protected
+		 */
 		getBaseFacets: function () {
 			return {
 				'pattern': /^true|false|1|0$/
 			};
 		},
+		/**
+		 * Get the facets that are allowed to be used by this validator.
+		 * @returns {string[]}
+		 * @protected
+		 */
 		getAllowedFacets: function () {
 			return [
 				'pattern', 
@@ -669,20 +974,42 @@ function (_, objTools, SimpleTypeNodeValidator, XmlValidationResult, XmlValidati
 	return function BooleanNodeValidator () {
 		var obj = objTools.construct(booleanNodeValidator, BooleanNodeValidator);
 		return obj.init.apply(obj, arguments);
-	}
+	};
 
 });
 define('xsdval/nodeValidator/DateTimeNodeValidator',['underscore', 'objTools', 'xsdval/nodeValidator/SimpleTypeNodeValidator',
 	'xsdval/XmlValidationResult', 'xsdval/XmlValidationError'],
 function (_, objTools, SimpleTypeNodeValidator, XmlValidationResult, XmlValidationError) {
 	
-	var dateTimeNodeValidator = objTools.make(SimpleTypeNodeValidator, {
+	/**
+	 * @constructor DateTimeNodeValidator
+	 * @classdesc Validates simple type nodes whose base type is `dateTime`.
+	 * @extends SimpleTypeNodeValidator
+	 * @param {Element} node - The XML node validated by this validator.
+	 * @param {Element} definition - The XSD node to be used for validation by this validator.
+	 * @param {NodeValidatorFactory} validatorFactory - The validator factory that can be used to spawn further validators if needed.
+	 */
+	var dateTimeNodeValidator = objTools.make(SimpleTypeNodeValidator, 
+	/**
+	 * @lends DateTimeNodeValidator.prototype
+	 */
+	{
 		type: 'dateTime',
+		/**
+		 * Get the base facets used by this validator.
+		 * @returns {Object.<string, *>}
+		 * @protected
+		 */
 		getBaseFacets: function () {
 			return {
 				'pattern': /^-?([1-9][0-9]{3,}|0[0-9]{3})-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])T(([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](\.[0-9]+)?|(24:00:00(\.0+)?))(Z|(\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))?$/
 			};
 		},
+		/**
+		 * Get the facets that are allowed to be used by this validator.
+		 * @returns {string[]}
+		 * @protected
+		 */
 		getAllowedFacets: function () {
 			return [
 				'pattern', 
@@ -699,20 +1026,42 @@ function (_, objTools, SimpleTypeNodeValidator, XmlValidationResult, XmlValidati
 	return function DateTimeNodeValidator () {
 		var obj = objTools.construct(dateTimeNodeValidator, DateTimeNodeValidator);
 		return obj.init.apply(obj, arguments);
-	}
+	};
 
 });
 define('xsdval/nodeValidator/TimeNodeValidator',['underscore', 'objTools', 'xsdval/nodeValidator/SimpleTypeNodeValidator',
 	'xsdval/XmlValidationResult', 'xsdval/XmlValidationError'],
 function (_, objTools, SimpleTypeNodeValidator, XmlValidationResult, XmlValidationError) {
 	
-	var timeNodeValidator = objTools.make(SimpleTypeNodeValidator, {
+	/**
+	 * @constructor TimeNodeValidator
+	 * @classdesc Validates simple type nodes whose base type is `time`.
+	 * @extends SimpleTypeNodeValidator
+	 * @param {Element} node - The XML node validated by this validator.
+	 * @param {Element} definition - The XSD node to be used for validation by this validator.
+	 * @param {NodeValidatorFactory} validatorFactory - The validator factory that can be used to spawn further validators if needed.
+	 */
+	var timeNodeValidator = objTools.make(SimpleTypeNodeValidator, 
+	/**
+	 * @lends TimeNodeValidator.prototype
+	 */
+	{
 		type: 'time',
+		/**
+		 * Get the base facets used by this validator.
+		 * @returns {Object.<string, *>}
+		 * @protected
+		 */
 		getBaseFacets: function () {
 			return {
 				'pattern': /^(([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](\.[0-9]+)?|(24:00:00(\.0+)?))(Z|(\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))?$/
 			};
 		},
+		/**
+		 * Get the facets that are allowed to be used by this validator.
+		 * @returns {string[]}
+		 * @protected
+		 */
 		getAllowedFacets: function () {
 			return [
 				'pattern', 
@@ -729,20 +1078,42 @@ function (_, objTools, SimpleTypeNodeValidator, XmlValidationResult, XmlValidati
 	return function TimeNodeValidator () {
 		var obj = objTools.construct(timeNodeValidator, TimeNodeValidator);
 		return obj.init.apply(obj, arguments);
-	}
+	};
 
 });
 define('xsdval/nodeValidator/DateNodeValidator',['underscore', 'objTools', 'xsdval/nodeValidator/SimpleTypeNodeValidator',
 	'xsdval/XmlValidationResult', 'xsdval/XmlValidationError'],
 function (_, objTools, SimpleTypeNodeValidator, XmlValidationResult, XmlValidationError) {
 	
-	var dateNodeValidator = objTools.make(SimpleTypeNodeValidator, {
+	/**
+	 * @constructor DateNodeValidator
+	 * @classdesc Validates simple type nodes whose base type is `date`.
+	 * @extends SimpleTypeNodeValidator
+	 * @param {Element} node - The XML node validated by this validator.
+	 * @param {Element} definition - The XSD node to be used for validation by this validator.
+	 * @param {NodeValidatorFactory} validatorFactory - The validator factory that can be used to spawn further validators if needed.
+	 */
+	var dateNodeValidator = objTools.make(SimpleTypeNodeValidator, 
+	/**
+	 * @lends DateNodeValidator.prototype
+	 */
+	{
 		type: 'date',
+		/**
+		 * Get the base facets used by this validator.
+		 * @returns {Object.<string, *>}
+		 * @protected
+		 */
 		getBaseFacets: function () {
 			return {
 				'pattern': /^-?([1-9][0-9]{3,}|0[0-9]{3})-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])(Z|(\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))?$/
 			};
 		},
+		/**
+		 * Get the facets that are allowed to be used by this validator.
+		 * @returns {string[]}
+		 * @protected
+		 */
 		getAllowedFacets: function () {
 			return [
 				'pattern', 
@@ -759,20 +1130,42 @@ function (_, objTools, SimpleTypeNodeValidator, XmlValidationResult, XmlValidati
 	return function DateNodeValidator () {
 		var obj = objTools.construct(dateNodeValidator, DateNodeValidator);
 		return obj.init.apply(obj, arguments);
-	}
+	};
 
 });
 define('xsdval/nodeValidator/HexBinaryNodeValidator',['underscore', 'objTools', 'xsdval/nodeValidator/SimpleTypeNodeValidator',
 	'xsdval/XmlValidationResult', 'xsdval/XmlValidationError'],
 function (_, objTools, SimpleTypeNodeValidator, XmlValidationResult, XmlValidationError) {
 	
-	var hexBinaryNodeValidator = objTools.make(SimpleTypeNodeValidator, {
+	/**
+	 * @constructor HexBinaryNodeValidator
+	 * @classdesc Validates simple type nodes whose base type is `hexBinary`.
+	 * @extends SimpleTypeNodeValidator
+	 * @param {Element} node - The XML node validated by this validator.
+	 * @param {Element} definition - The XSD node to be used for validation by this validator.
+	 * @param {NodeValidatorFactory} validatorFactory - The validator factory that can be used to spawn further validators if needed.
+	 */
+	var hexBinaryNodeValidator = objTools.make(SimpleTypeNodeValidator, 
+	/**
+	 * @lends HexBinaryNodeValidator.prototype
+	 */
+	{
 		type: 'hexBinary',
+		/**
+		 * Get the base facets used by this validator.
+		 * @returns {Object.<string, *>}
+		 * @protected
+		 */
 		getBaseFacets: function () {
 			return {
 				'pattern': /^([0-9a-fA-F]{2})*$/
 			};
 		},
+		/**
+		 * Get the facets that are allowed to be used by this validator.
+		 * @returns {string[]}
+		 * @protected
+		 */
 		getAllowedFacets: function () {
 			return [
 				'length',
@@ -783,25 +1176,58 @@ function (_, objTools, SimpleTypeNodeValidator, XmlValidationResult, XmlValidati
 				'assertion'
 			];
 		},
+		/**
+		 * Validates the `totalDigits` facet.
+		 * @param {string} facetValue
+		 * @returns {boolean}
+		 * @protected
+		 */
 		validateTotalDigits: function (facetValue) {
 			return this.getNodeValue().replace(/\D/g, '').length <= facetValue;
 		},
+		/**
+		 * Validates the `fractionDigits` facet.
+		 * @param {string} facetValue
+		 * @returns {boolean}
+		 * @protected
+		 */
 		validateFractionDigits: function (facetValue) {
 			var v = this.getNodeValue();
-			var fracDigits = v.indexOf('.') === -1
-				? 0
-				: v.split('.')[1].length;
+			var fracDigits = (v.indexOf('.') === -1) ? 0 : v.split('.')[1].length;
 			return fracDigits <= facetValue;
 		},
+		/**
+		 * Returns the length of the value of the XML node.
+		 * @returns {number}
+		 * @protected
+		 */
 		getNodeValueLength: function () {
 			return this.getNodeValue().length / 2;
 		},
+		/**
+		 * Validates the `maxLength` facet.
+		 * @param {string} facetValue
+		 * @returns {boolean}
+		 * @protected
+		 */
 		validateMaxLength: function (facetValue) {
 			return this.getNodeValueLength() <= facetValue;
 		},
+		/**
+		 * Validates the `minLength` facet.
+		 * @param {string} facetValue
+		 * @returns {boolean}
+		 * @protected
+		 */
 		validateMinLength: function (facetValue) {
 			return this.getNodeValueLength() >= facetValue;
 		},
+		/**
+		 * Validates the `length` facet.
+		 * @param {string} facetValue
+		 * @returns {boolean}
+		 * @protected
+		 */
 		validateLength: function (facetValue) {
 			return this.getNodeValueLength() == facetValue;
 		}
@@ -810,15 +1236,32 @@ function (_, objTools, SimpleTypeNodeValidator, XmlValidationResult, XmlValidati
 	return function HexBinaryNodeValidator () {
 		var obj = objTools.construct(hexBinaryNodeValidator, HexBinaryNodeValidator);
 		return obj.init.apply(obj, arguments);
-	}
+	};
 
 });
 define('xsdval/nodeValidator/StringNodeValidator',['underscore', 'objTools', 'xsdval/nodeValidator/SimpleTypeNodeValidator',
-	 'xsdval/XmlValidationResult', 'xsdval/XmlValidationError'],
+	'xsdval/XmlValidationResult', 'xsdval/XmlValidationError'],
 function (_, objTools, SimpleTypeNodeValidator, XmlValidationResult, XmlValidationError) {
 	
-	var stringNodeValidator = objTools.make(SimpleTypeNodeValidator, {
+	/**
+	 * @constructor StringNodeValidator
+	 * @classdesc Validates simple type nodes whose base type is `string`.
+	 * @extends SimpleTypeNodeValidator
+	 * @param {Element} node - The XML node validated by this validator.
+	 * @param {Element} definition - The XSD node to be used for validation by this validator.
+	 * @param {NodeValidatorFactory} validatorFactory - The validator factory that can be used to spawn further validators if needed.
+	 */
+	var stringNodeValidator = objTools.make(SimpleTypeNodeValidator, 
+	/**
+	 * @lends StringNodeValidator.prototype
+	 */
+	{
 		type: 'string',
+		/**
+		 * Get the facets that are allowed to be used by this validator.
+		 * @returns {string[]}
+		 * @protected
+		 */
 		getAllowedFacets: function () {
 			return [
 				'length', 
@@ -829,12 +1272,30 @@ function (_, objTools, SimpleTypeNodeValidator, XmlValidationResult, XmlValidati
 				'assertion'
 			];
 		},
+		/**
+		 * Validates the `maxLength` facet.
+		 * @param {string} facetValue
+		 * @returns {boolean}
+		 * @protected
+		 */
 		validateMaxLength: function (facetValue) {
 			return this.getNodeValue().length <= facetValue;
 		},
+		/**
+		 * Validates the `minLength` facet.
+		 * @param {string} facetValue
+		 * @returns {boolean}
+		 * @protected
+		 */
 		validateMinLength: function (facetValue) {
 			return this.getNodeValue().length >= facetValue;
 		},
+		/**
+		 * Validates the `length` facet.
+		 * @param {string} facetValue
+		 * @returns {boolean}
+		 * @protected
+		 */
 		validateLength: function (facetValue) {
 			return this.getNodeValue().length == facetValue;
 		}
@@ -843,7 +1304,7 @@ function (_, objTools, SimpleTypeNodeValidator, XmlValidationResult, XmlValidati
 	return function StringNodeValidator () {
 		var obj = objTools.construct(stringNodeValidator, StringNodeValidator);
 		return obj.init.apply(obj, arguments);
-	}
+	};
 
 });
 define('xsdval/NodeValidatorFactory',['underscore', 'objTools', 'xsd', 
@@ -924,9 +1385,9 @@ function (_, objTools, xsd, NodeValidator, ComplexTypeNodeValidator, AnyTypeNode
 		 * @returns {Element|null}
 		 */
 		getXsdDefinition: function (xsdElement, type) {
-			var node = type
-				? this.xsdLibrary.findTypeDefinition(type.namespaceURI, type.name)
-				: xsdElement.children[0];
+			var node = type ?
+				this.xsdLibrary.findTypeDefinition(type.namespaceURI, type.name) :
+				xsdElement.children[0];
 			return node || null;
 		}
 	};
