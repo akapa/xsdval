@@ -8,9 +8,9 @@
     "requirejs-text": "latest",
     "underscore": "latest",
     "wgxpath": "https://wicked-good-xpath.googlecode.com/files/wgxpath.install.js",
-    "xsd": "file:///home/kapa/galina/kapa/xsd/.git/",
-    "Library": "file:///home/kapa/galina/kapa/Library/.git/",
-    "objTools": "file:///home/kapa/galina/kapa/objTools/.git/"    
+    "xsd": "bazmegakapa/kapa-xsd",
+    "Library": "bazmegakapa/kapa-Library",
+    "objTools": "bazmegakapa/kapa-objTools"
   },
   "install": {
     "path": {
