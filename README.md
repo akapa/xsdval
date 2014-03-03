@@ -7,7 +7,6 @@ Provides tools to validate an XML document against a set of XSD schemas in Javas
 Defined in a [RequireJS](http://requirejs.org/) format, so you need an AMD loader.
 
 Uses: 
-
  - [Underscore.js](http://underscorejs.org/)
  - [wicked-good-xpath](https://code.google.com/p/wicked-good-xpath/)
  - [requirejs-text](https://github.com/requirejs/text)
