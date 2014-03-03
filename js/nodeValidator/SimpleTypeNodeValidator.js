@@ -18,6 +18,14 @@ function (_, objTools, xsd, NodeValidator, primitiveUnserializers,
 	 */
 	{
 		/**
+		 * Must be overridden to specify the type this validator can be used to validate.
+		 * For example 'string', 'anyType', 'dateTime', etc.
+		 * @member {string} type
+		 * @memberof SimpleTypeNodeValidator#
+		 * @protected
+		 */		
+		type: '',
+		/**
 		 * Get the base facets used by this validator. Derived node validators should override this method and add their own base facets.
 		 * @returns {Object.<string, *>}
 		 * @protected

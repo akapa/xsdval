@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Class: XmlValidationError</title>
+    <title>JSDoc: Class: AnyTypeNodeValidator</title>
     
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">Class: XmlValidationError</h1>
+    <h1 class="page-title">Class: AnyTypeNodeValidator</h1>
     
     
 
@@ -27,10 +27,10 @@
     
 <header>
     <h2>
-    XmlValidationError
+    AnyTypeNodeValidator
     </h2>
     
-        <div class="class-description">Provides information on a validation error.</div>
+        <div class="class-description">A validator for an element marked `anyType`.</div>
     
 </header>  
 
@@ -41,7 +41,7 @@
     
         
 <dt>
-    <h4 class="name" id="XmlValidationError"><span class="type-signature"></span>new XmlValidationError<span class="signature">(failingNode, failedXsdNode, type)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="AnyTypeNodeValidator"><span class="type-signature"></span>new AnyTypeNodeValidator<span class="signature">(node, definition, validatorFactory)</span><span class="type-signature"></span></h4>
     
     
 </dt>
@@ -79,7 +79,7 @@
 	
         <tr>
             
-                <td class="name"><code>failingNode</code></td>
+                <td class="name"><code>node</code></td>
             
             
             <td class="type">
@@ -95,14 +95,14 @@
             
             
             
-            <td class="description last">The XML node that failed validation.</td>
+            <td class="description last">The XML node validated by this validator.</td>
         </tr>
 	
 	
 	
         <tr>
             
-                <td class="name"><code>failedXsdNode</code></td>
+                <td class="name"><code>definition</code></td>
             
             
             <td class="type">
@@ -118,20 +118,20 @@
             
             
             
-            <td class="description last">The XSD node containing the validation rule that was not passed.</td>
+            <td class="description last">The XSD node to be used for validation by this validator.</td>
         </tr>
 	
 	
 	
         <tr>
             
-                <td class="name"><code>type</code></td>
+                <td class="name"><code>validatorFactory</code></td>
             
             
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type"><a href="NodeValidatorFactory.html">NodeValidatorFactory</a></span>
 
 
             
@@ -141,7 +141,7 @@
             
             
             
-            <td class="description last">A short non-standard hint on what type of validation rule was failed.</td>
+            <td class="description last">The validator factory that can be used to spawn further validators if needed.</td>
         </tr>
 	
 	
@@ -172,7 +172,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="XmlValidationError.js.html">XmlValidationError.js</a>, <a href="XmlValidationError.js.html#line7">line 7</a>
+        <a href="AnyTypeNodeValidator.js.html">nodeValidator/AnyTypeNodeValidator.js</a>, <a href="AnyTypeNodeValidator.js.html#line5">line 5</a>
     </li></ul></dd>
     
     
@@ -201,6 +201,11 @@
     </div>
     
     
+        <h3 class="subsection-title">Extends</h3>
+        
+        <ul>
+            <li><a href="NodeValidator.html">NodeValidator</a></li>
+        </ul>
     
     
     
@@ -211,34 +216,32 @@
     
     
     
-        <h3 class="subsection-title">Members</h3>
+    
+    
+    
+        <h3 class="subsection-title">Methods</h3>
         
         <dl>
             
 <dt>
-    <h4 class="name" id="failedXsdNode"><span class="type-signature"></span>failedXsdNode<span class="type-signature"> :Element</span></h4>
+    <h4 class="name" id="validate"><span class="type-signature"></span>validate<span class="signature">()</span><span class="type-signature"> &rarr; {<a href="XmlValidationResult.html">XmlValidationResult</a>}</span></h4>
     
     
 </dt>
 <dd>
     
+    
     <div class="description">
-        The XSD node containing the validation rule that was not passed.
+        Checks the `type` attribute for the real type of the element, spawns and runs the fitting validator.
     </div>
     
+
     
     
-        <h5>Type:</h5>
-        <ul>
-            <li>
-                
-<span class="param-type">Element</span>
-
-
-            </li>
-        </ul>
     
-
+    
+    
+    
     
 <dl class="details">
     
@@ -262,7 +265,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="XmlValidationError.js.html">XmlValidationError.js</a>, <a href="XmlValidationError.js.html#line21">line 21</a>
+        <a href="AnyTypeNodeValidator.js.html">nodeValidator/AnyTypeNodeValidator.js</a>, <a href="AnyTypeNodeValidator.js.html#line23">line 23</a>
     </li></ul></dd>
     
     
@@ -275,139 +278,37 @@
 
     
     
-</dd>
 
-        
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
             
-<dt>
-    <h4 class="name" id="failingNode"><span class="type-signature"></span>failingNode<span class="type-signature"> :Element</span></h4>
-    
-    
-</dt>
-<dd>
-    
-    <div class="description">
-        The XML node that failed validation.
-    </div>
-    
-    
-    
-        <h5>Type:</h5>
-        <ul>
-            <li>
-                
-<span class="param-type">Element</span>
 
 
-            </li>
-        </ul>
-    
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="XmlValidationResult.html">XmlValidationResult</a></span>
 
-    
-<dl class="details">
-    
-        
-    
-    
-    
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="XmlValidationError.js.html">XmlValidationError.js</a>, <a href="XmlValidationError.js.html#line15">line 15</a>
-    </li></ul></dd>
-    
-    
-    
-    
-    
-    
-    
+	</dd>
 </dl>
 
-    
-    
-</dd>
-
         
-            
-<dt>
-    <h4 class="name" id="type"><span class="type-signature"></span>type<span class="type-signature"> :string</span></h4>
-    
-    
-</dt>
-<dd>
-    
-    <div class="description">
-        A short non-standard hint on what type of validation rule was failed.
-    </div>
-    
-    
-    
-        <h5>Type:</h5>
-        <ul>
-            <li>
-                
-<span class="param-type">string</span>
-
-
-            </li>
-        </ul>
-    
-
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="XmlValidationError.js.html">XmlValidationError.js</a>, <a href="XmlValidationError.js.html#line27">line 27</a>
-    </li></ul></dd>
-    
-    
-    
-    
-    
-    
-    
-</dl>
-
     
     
 </dd>
 
         </dl>
-    
-    
     
     
     
@@ -429,7 +330,7 @@
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Mon Mar 03 2014 15:44:41 GMT+0100 (CET)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Mon Mar 03 2014 15:44:34 GMT+0100 (CET)
 </footer>
 
 <script> prettyPrint(); </script>

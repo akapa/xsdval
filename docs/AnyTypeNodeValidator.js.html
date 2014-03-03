@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: XmlValidationResult.js</title>
+    <title>JSDoc: Source: nodeValidator/AnyTypeNodeValidator.js</title>
     
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">Source: XmlValidationResult.js</h1>
+    <h1 class="page-title">Source: nodeValidator/AnyTypeNodeValidator.js</h1>
     
     
 
@@ -25,53 +25,37 @@
     
     <section>
         <article>
-            <pre class="prettyprint source"><code>define(['underscore', 'objTools'], function (_, objTools) {
-
+            <pre class="prettyprint source"><code>define(['underscore', 'objTools', 'xsd', 'xsdval/nodeValidator/NodeValidator',
+	'xsdval/XmlValidationResult', 'xsdval/XmlValidationError'],
+function (_, objTools, xsd, NodeValidator, XmlValidationResult, XmlValidationError) {
+	
 	/**
-	 * @lends XmlValidationResult.prototype
-	 */
-	var xmlValidationResult = {
+	 * @constructor AnyTypeNodeValidator
+	 * @classdesc A validator for an element marked `anyType`.
+	 * @extends NodeValidator
+	 * @param {Element} node - The XML node validated by this validator.
+	 * @param {Element} definition - The XSD node to be used for validation by this validator.
+	 * @param {NodeValidatorFactory} validatorFactory - The validator factory that can be used to spawn further validators if needed.
+	 */	
+	var anyTypeNodeValidator = objTools.make(NodeValidator, 
+	/**
+	 * @lends AnyTypeNodeValidator.prototype
+	 */	
+	{
+		type: 'anyType',
 		/**
-		 * @constructor XmlValidationResult
-		 * @classdesc Stores validation errors and reports on success.
-		 * @param {XmlValidationError[]} errors - Errors added initially, success is validated based on this.
+		 * Checks the `type` attribute for the real type of the element, spawns and runs the fitting validator.
+		 * @returns {XmlValidationResult}
 		 */
-		init: function (errors) {
-			/**
-			 * The errors returned by the validation.
-			 * @member {XmlValidationError[]} errors
-			 * @memberof XmlValidationResult#
-			 */
-			this.errors = errors ? [].concat(errors) : [];
-			this.checkSuccess();
-			return this;
-		},
-		/**
-		 * Adds errors to the collection, success is revalidated.
-		 * @param {XmlValidationError[]} errors - Errors added.
-		 */
-		add: function (errors) {
-			if (errors) {
-				this.errors = this.errors.concat(errors);
-				this.checkSuccess();
-			}
-		},
-		/**
-		 * Checks the count of errors and sets success to true if it is zero. No need to call it when methods are used to manipulate the error collection.
-		 * @protected
-		 */
-		checkSuccess: function () {
-			/**
-			 * Can be read to check whether validation was a success (no errors) or not.
-			 * @member {boolean} success
-			 * @memberof XmlValidationResult#
-			 */
-			this.success = this.errors.length === 0;
+		validate: function () {
+			var type = xsd.getTypeFromNodeAttr(this.node, 'type', xsd.xsi);
+			var validator = this.validatorFactory.getValidator(typeDef, this.node, type);
+			return validator.validate();
 		}
-	};
+	});
 
-	return function XmlValidationResult () {
-		var obj = objTools.construct(xmlValidationResult, XmlValidationResult);
+	return function AnyTypeNodeValidator () {
+		var obj = objTools.construct(anyTypeNodeValidator, AnyTypeNodeValidator);
 		return obj.init.apply(obj, arguments);
 	};
 

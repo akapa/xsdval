@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Class: SimpleTypeNodeValidator</title>
+    <title>JSDoc: Class: DateTimeNodeValidator</title>
     
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">Class: SimpleTypeNodeValidator</h1>
+    <h1 class="page-title">Class: DateTimeNodeValidator</h1>
     
     
 
@@ -27,10 +27,10 @@
     
 <header>
     <h2>
-    SimpleTypeNodeValidator
+    DateTimeNodeValidator
     </h2>
     
-        <div class="class-description">Serves as a base for node validators that validate simple types.</div>
+        <div class="class-description">Validates simple type nodes whose base type is `dateTime`.</div>
     
 </header>  
 
@@ -41,7 +41,7 @@
     
         
 <dt>
-    <h4 class="name" id="SimpleTypeNodeValidator"><span class="type-signature">&lt;abstract> </span>new SimpleTypeNodeValidator<span class="signature">(node, definition, validatorFactory)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="DateTimeNodeValidator"><span class="type-signature"></span>new DateTimeNodeValidator<span class="signature">(node, definition, validatorFactory)</span><span class="type-signature"></span></h4>
     
     
 </dt>
@@ -172,7 +172,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="SimpleTypeNodeValidator.js.html">nodeValidator/SimpleTypeNodeValidator.js</a>, <a href="SimpleTypeNodeValidator.js.html#line6">line 6</a>
+        <a href="DateTimeNodeValidator.js.html">nodeValidator/DateTimeNodeValidator.js</a>, <a href="DateTimeNodeValidator.js.html#line5">line 5</a>
     </li></ul></dd>
     
     
@@ -204,7 +204,7 @@
         <h3 class="subsection-title">Extends</h3>
         
         <ul>
-            <li><a href="NodeValidator.html">NodeValidator</a></li>
+            <li><a href="SimpleTypeNodeValidator.html">SimpleTypeNodeValidator</a></li>
         </ul>
     
     
@@ -255,6 +255,11 @@ For example 'string', 'anyType', 'dateTime', etc.
     
 
     
+    <dt class="inherited-from">Inherited From:</dt>
+    <dd class="inherited-from"><ul class="dummy"><li>
+        <a href="SimpleTypeNodeValidator.html#type">SimpleTypeNodeValidator#type</a>
+    </li></dd>
+    
     
     
     
@@ -301,7 +306,7 @@ For example 'string', 'anyType', 'dateTime', etc.
     
     
     <div class="description">
-        Get the facets that are allowed to be used by this validator. Derived node validators should override this method and add their own allowed facets.
+        Get the facets that are allowed to be used by this validator.
     </div>
     
 
@@ -334,7 +339,7 @@ For example 'string', 'anyType', 'dateTime', etc.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="SimpleTypeNodeValidator.js.html">nodeValidator/SimpleTypeNodeValidator.js</a>, <a href="SimpleTypeNodeValidator.js.html#line41">line 41</a>
+        <a href="DateTimeNodeValidator.js.html">nodeValidator/DateTimeNodeValidator.js</a>, <a href="DateTimeNodeValidator.js.html#line34">line 34</a>
     </li></ul></dd>
     
     
@@ -388,7 +393,7 @@ For example 'string', 'anyType', 'dateTime', etc.
     
     
     <div class="description">
-        Get the base facets used by this validator. Derived node validators should override this method and add their own base facets.
+        Get the base facets used by this validator.
     </div>
     
 
@@ -421,7 +426,7 @@ For example 'string', 'anyType', 'dateTime', etc.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="SimpleTypeNodeValidator.js.html">nodeValidator/SimpleTypeNodeValidator.js</a>, <a href="SimpleTypeNodeValidator.js.html#line33">line 33</a>
+        <a href="DateTimeNodeValidator.js.html">nodeValidator/DateTimeNodeValidator.js</a>, <a href="DateTimeNodeValidator.js.html#line24">line 24</a>
     </li></ul></dd>
     
     
@@ -542,6 +547,11 @@ For example 'string', 'anyType', 'dateTime', etc.
     
 
     
+    <dt class="inherited-from">Inherited From:</dt>
+    <dd class="inherited-from"><ul class="dummy"><li>
+        <a href="SimpleTypeNodeValidator.html#getFacets">SimpleTypeNodeValidator#getFacets</a>
+    </li></dd>
+    
     
     
     
@@ -633,6 +643,11 @@ Used for validations where the XML string representation needs to be checked.
     
     
 
+    
+    <dt class="inherited-from">Inherited From:</dt>
+    <dd class="inherited-from"><ul class="dummy"><li>
+        <a href="SimpleTypeNodeValidator.html#getNodeValue">SimpleTypeNodeValidator#getNodeValue</a>
+    </li></dd>
     
     
     
@@ -813,6 +828,11 @@ Used to validate facets that are based on the real value, not the string represe
     
 
     
+    <dt class="inherited-from">Inherited From:</dt>
+    <dd class="inherited-from"><ul class="dummy"><li>
+        <a href="SimpleTypeNodeValidator.html#getTypedNodeValue">SimpleTypeNodeValidator#getTypedNodeValue</a>
+    </li></dd>
+    
     
     
     
@@ -901,6 +921,11 @@ Can be safely overridden in case XPath will have problems with the plain XML rep
     
     
 
+    
+    <dt class="inherited-from">Inherited From:</dt>
+    <dd class="inherited-from"><ul class="dummy"><li>
+        <a href="SimpleTypeNodeValidator.html#getXpathValue">SimpleTypeNodeValidator#getXpathValue</a>
+    </li></dd>
     
     
     
@@ -1114,6 +1139,11 @@ Can be safely overridden in case XPath will have problems with the plain XML rep
     
 
     
+    <dt class="inherited-from">Inherited From:</dt>
+    <dd class="inherited-from"><ul class="dummy"><li>
+        <a href="SimpleTypeNodeValidator.html#invokeFacetValidation">SimpleTypeNodeValidator#invokeFacetValidation</a>
+    </li></dd>
+    
     
     
     
@@ -1203,6 +1233,11 @@ Can be safely overridden in case XPath will have problems with the plain XML rep
     
     
 
+    
+    <dt class="inherited-from">Inherited From:</dt>
+    <dd class="inherited-from"><ul class="dummy"><li>
+        <a href="SimpleTypeNodeValidator.html#validate">SimpleTypeNodeValidator#validate</a>
+    </li></dd>
     
     
     
@@ -1339,6 +1374,11 @@ Can be safely overridden in case XPath will have problems with the plain XML rep
     
 
     
+    <dt class="inherited-from">Inherited From:</dt>
+    <dd class="inherited-from"><ul class="dummy"><li>
+        <a href="SimpleTypeNodeValidator.html#validateAssertion">SimpleTypeNodeValidator#validateAssertion</a>
+    </li></dd>
+    
     
     
     
@@ -1427,6 +1467,11 @@ Override <a href="SimpleTypeNodeValidator.html#getBaseFacets">getBaseFacets()</a
     
 
     
+    <dt class="inherited-from">Inherited From:</dt>
+    <dd class="inherited-from"><ul class="dummy"><li>
+        <a href="SimpleTypeNodeValidator.html#validateBaseFacets">SimpleTypeNodeValidator#validateBaseFacets</a>
+    </li></dd>
+    
     
     
     
@@ -1513,6 +1558,11 @@ Override <a href="SimpleTypeNodeValidator.html#getBaseFacets">getBaseFacets()</a
     
     
 
+    
+    <dt class="inherited-from">Inherited From:</dt>
+    <dd class="inherited-from"><ul class="dummy"><li>
+        <a href="SimpleTypeNodeValidator.html#validateBaseType">SimpleTypeNodeValidator#validateBaseType</a>
+    </li></dd>
     
     
     
@@ -1648,6 +1698,11 @@ Override <a href="SimpleTypeNodeValidator.html#getBaseFacets">getBaseFacets()</a
     
     
 
+    
+    <dt class="inherited-from">Inherited From:</dt>
+    <dd class="inherited-from"><ul class="dummy"><li>
+        <a href="SimpleTypeNodeValidator.html#validateEnumeration">SimpleTypeNodeValidator#validateEnumeration</a>
+    </li></dd>
     
     
     
@@ -1810,6 +1865,11 @@ Override <a href="SimpleTypeNodeValidator.html#getBaseFacets">getBaseFacets()</a
     
 
     
+    <dt class="inherited-from">Inherited From:</dt>
+    <dd class="inherited-from"><ul class="dummy"><li>
+        <a href="SimpleTypeNodeValidator.html#validateFacet">SimpleTypeNodeValidator#validateFacet</a>
+    </li></dd>
+    
     
     
     
@@ -1900,6 +1960,11 @@ Takes inherited facets into account, travelling up the tree.
     
     
 
+    
+    <dt class="inherited-from">Inherited From:</dt>
+    <dd class="inherited-from"><ul class="dummy"><li>
+        <a href="SimpleTypeNodeValidator.html#validateFacets">SimpleTypeNodeValidator#validateFacets</a>
+    </li></dd>
     
     
     
@@ -2036,6 +2101,11 @@ Takes inherited facets into account, travelling up the tree.
     
 
     
+    <dt class="inherited-from">Inherited From:</dt>
+    <dd class="inherited-from"><ul class="dummy"><li>
+        <a href="SimpleTypeNodeValidator.html#validateMaxExclusive">SimpleTypeNodeValidator#validateMaxExclusive</a>
+    </li></dd>
+    
     
     
     
@@ -2170,6 +2240,11 @@ Takes inherited facets into account, travelling up the tree.
     
     
 
+    
+    <dt class="inherited-from">Inherited From:</dt>
+    <dd class="inherited-from"><ul class="dummy"><li>
+        <a href="SimpleTypeNodeValidator.html#validateMaxInclusive">SimpleTypeNodeValidator#validateMaxInclusive</a>
+    </li></dd>
     
     
     
@@ -2306,6 +2381,11 @@ Takes inherited facets into account, travelling up the tree.
     
 
     
+    <dt class="inherited-from">Inherited From:</dt>
+    <dd class="inherited-from"><ul class="dummy"><li>
+        <a href="SimpleTypeNodeValidator.html#validateMinExclusive">SimpleTypeNodeValidator#validateMinExclusive</a>
+    </li></dd>
+    
     
     
     
@@ -2440,6 +2520,11 @@ Takes inherited facets into account, travelling up the tree.
     
     
 
+    
+    <dt class="inherited-from">Inherited From:</dt>
+    <dd class="inherited-from"><ul class="dummy"><li>
+        <a href="SimpleTypeNodeValidator.html#validateMinInclusive">SimpleTypeNodeValidator#validateMinInclusive</a>
+    </li></dd>
     
     
     
@@ -2579,6 +2664,11 @@ Takes inherited facets into account, travelling up the tree.
     
 
     
+    <dt class="inherited-from">Inherited From:</dt>
+    <dd class="inherited-from"><ul class="dummy"><li>
+        <a href="SimpleTypeNodeValidator.html#validatePattern">SimpleTypeNodeValidator#validatePattern</a>
+    </li></dd>
+    
     
     
     
@@ -2658,7 +2748,7 @@ Takes inherited facets into account, travelling up the tree.
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Mon Mar 03 2014 15:44:39 GMT+0100 (CET)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Mon Mar 03 2014 15:44:36 GMT+0100 (CET)
 </footer>
 
 <script> prettyPrint(); </script>
