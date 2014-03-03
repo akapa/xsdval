@@ -7,7 +7,6 @@ Provides tools to validate an XML document against a set of XSD schemas in Javas
 Defined in a [RequireJS](http://requirejs.org/) format, so you need an AMD loader.
 
 Uses: 
-
  - [Underscore.js](http://underscorejs.org/)
  - [wicked-good-xpath](https://code.google.com/p/wicked-good-xpath/)
  - [requirejs-text](https://github.com/requirejs/text)
@@ -15,7 +14,7 @@ Uses:
 
 ##Tests
 
-Tests are written in Jasmine and I run them with Karma.
+Tests are written in [Jasmine 2.0](http://jasmine.github.io/2.0/introduction.html) and I run them with [Karma](http://karma-runner.github.io/0.10/index.html).
 
 ##Documentation
 
