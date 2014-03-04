@@ -157,9 +157,9 @@ function (_, objTools, xsd, NodeValidator, XmlValidationResult, XmlValidationErr
 		}
 	});
 
-	return function ComplexTypeNodeValidator () {
-		var obj = objTools.construct(complexTypeNodeValidator, ComplexTypeNodeValidator);
-		return obj.init.apply(obj, arguments);
-	};
+	return objTools.makeConstructor(
+		function ComplexTypeNodeValidator () {}, 
+		complexTypeNodeValidator
+	);
 	
 });

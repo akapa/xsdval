@@ -48,14 +48,12 @@ define(['underscore'], function (_) {
 		 * @returns {Function}
 		 */
 		makeConstructor: function (func, obj) {
-			func.prototype = obj;
 			var f = function () {
 				var o = new func();
-				if ('init' in o) {
-					o.init.apply(o, arguments);
-				}
-				return o;
+				return 'init' in o ? o.init.apply(o, arguments) : o;
 			};
+			func.prototype = obj;
+			f.prototype = obj;
 			return f;
 		}
 	};

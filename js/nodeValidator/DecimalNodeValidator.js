@@ -66,9 +66,9 @@ function (_, objTools, SimpleTypeNodeValidator, XmlValidationResult, XmlValidati
 		}
 	});
 
-	return function DecimalNodeValidator () {
-		var obj = objTools.construct(decimalNodeValidator, DecimalNodeValidator);
-		return obj.init.apply(obj, arguments);
-	};
+	return objTools.makeConstructor(
+		function DecimalNodeValidator () {}, 
+		decimalNodeValidator
+	);
 
 });

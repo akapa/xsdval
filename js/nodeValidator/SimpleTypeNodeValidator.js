@@ -267,9 +267,10 @@ function (_, objTools, xsd, NodeValidator, primitiveUnserializers,
 		}
 	});
 
-	return function SimpleTypeNodeValidator () {
-		var obj = objTools.construct(simpleTypeNodeValidator, SimpleTypeNodeValidator);
-		return obj.init.apply(obj, arguments);
-	};
+	return objTools.makeConstructor(
+		function SimpleTypeNodeValidator () {}, 
+		simpleTypeNodeValidator
+	);
+
 
 });

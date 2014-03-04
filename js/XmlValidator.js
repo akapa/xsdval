@@ -45,9 +45,6 @@ function (objTools, XsdLibrary, NodeValidatorFactory) {
 		}
 	};
 
-	return function XmlValidator () {
-		var obj = objTools.construct(xmlValidator, XmlValidator);
-		return obj.init.apply(obj, arguments);
-	};
+	return objTools.makeConstructor(function XmlValidator () {}, xmlValidator);
 	
 });

@@ -98,9 +98,9 @@ function (_, objTools, SimpleTypeNodeValidator, XmlValidationResult, XmlValidati
 		}
 	});
 
-	return function HexBinaryNodeValidator () {
-		var obj = objTools.construct(hexBinaryNodeValidator, HexBinaryNodeValidator);
-		return obj.init.apply(obj, arguments);
-	};
+	return objTools.makeConstructor(
+		function HexBinaryNodeValidator () {}, 
+		hexBinaryNodeValidator
+	);
 
 });

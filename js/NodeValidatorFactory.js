@@ -97,9 +97,9 @@ function (_, objTools, xsd, NodeValidator, ComplexTypeNodeValidator, AnyTypeNode
 		'boolean': BooleanNodeValidator
 	};
 
-	return function NodeValidatorFactory () {
-		var obj = objTools.construct(nodeValidatorFactory, NodeValidatorFactory);
-		return obj.init.apply(obj, arguments);
-	};
+	return objTools.makeConstructor(
+		function NodeValidatorFactory () {}, 
+		nodeValidatorFactory
+	);
 
 });

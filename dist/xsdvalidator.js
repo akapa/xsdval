@@ -8,7 +8,6 @@ function (_, objTools, Library, xsd, basetypesXsd) {
 	 * A basic library/collection used to store and retrieve items.
 	 * @external Library
 	 */
-
 	var xsdLibrary = objTools.make(Library, 
 	/**
 	 * @lends XsdLibrary.prototype
@@ -97,10 +96,7 @@ function (_, objTools, Library, xsd, basetypesXsd) {
 		}
 	});
 
-	return function XsdLibrary () {
-		var obj = objTools.construct(xsdLibrary, XsdLibrary);
-		return obj.init.apply(obj, arguments);
-	};
+	return objTools.makeConstructor(function XsdLibrary () {}, xsdLibrary);
 });
 define('xsdval/XmlValidationResult',['underscore', 'objTools'], function (_, objTools) {
 
@@ -147,10 +143,10 @@ define('xsdval/XmlValidationResult',['underscore', 'objTools'], function (_, obj
 		}
 	};
 
-	return function XmlValidationResult () {
-		var obj = objTools.construct(xmlValidationResult, XmlValidationResult);
-		return obj.init.apply(obj, arguments);
-	};
+	return objTools.makeConstructor(
+		function XmlValidationResult () {}, 
+		xmlValidationResult
+	);
 
 });
 define('xsdval/nodeValidator/NodeValidator',['underscore', 'objTools', 'xsdval/XmlValidationResult'],
@@ -183,10 +179,7 @@ function (_, objTools, XmlValidationResult) {
 		}
 	};
 
-	return function NodeValidator () {
-		var obj = objTools.construct(nodeValidator, NodeValidator);
-		return obj.init.apply(obj, arguments);
-	};
+	return objTools.makeConstructor(function NodeValidator () {}, nodeValidator);
 
 });
 define('xsdval/XmlValidationError',['underscore', 'objTools'], function (_, objTools) {
@@ -225,10 +218,12 @@ define('xsdval/XmlValidationError',['underscore', 'objTools'], function (_, objT
 			return this;
 		}
 	};
-	return function XmlValidationError () {
-		var obj = objTools.construct(xmlValidationError, XmlValidationError);
-		return obj.init.apply(obj, arguments);
-	};
+
+	return objTools.makeConstructor(
+		function XmlValidationError () {}, 
+		xmlValidationError
+	);
+
 });
 define('xsdval/nodeValidator/ComplexTypeNodeValidator',['underscore', 'objTools', 'xsd', 'xsdval/nodeValidator/NodeValidator',
 	'xsdval/XmlValidationResult', 'xsdval/XmlValidationError'],
@@ -389,10 +384,10 @@ function (_, objTools, xsd, NodeValidator, XmlValidationResult, XmlValidationErr
 		}
 	});
 
-	return function ComplexTypeNodeValidator () {
-		var obj = objTools.construct(complexTypeNodeValidator, ComplexTypeNodeValidator);
-		return obj.init.apply(obj, arguments);
-	};
+	return objTools.makeConstructor(
+		function ComplexTypeNodeValidator () {}, 
+		complexTypeNodeValidator
+	);
 	
 });
 define('xsdval/nodeValidator/AnyTypeNodeValidator',['underscore', 'objTools', 'xsd', 'xsdval/nodeValidator/NodeValidator',
@@ -424,10 +419,10 @@ function (_, objTools, xsd, NodeValidator, XmlValidationResult, XmlValidationErr
 		}
 	});
 
-	return function AnyTypeNodeValidator () {
-		var obj = objTools.construct(anyTypeNodeValidator, AnyTypeNodeValidator);
-		return obj.init.apply(obj, arguments);
-	};
+	return objTools.makeConstructor(
+		function AnyTypeNodeValidator () {}, 
+		anyTypeNodeValidator
+	);
 
 });
 define('xsdval/nodeValidator/AnySimpleTypeNodeValidator',['underscore', 'objTools', 'xsd', 'xsdval/nodeValidator/NodeValidator',
@@ -466,10 +461,10 @@ function (_, objTools, xsd, NodeValidator, XmlValidationResult, XmlValidationErr
 		}
 	});
 
-	return function AnySimpleTypeNodeValidator () {
-		var obj = objTools.construct(anySimpleTypeNodeValidator, AnySimpleTypeNodeValidator);
-		return obj.init.apply(obj, arguments);
-	};
+	return objTools.makeConstructor(
+		function anySimpleTypeNodeValidator () {}, 
+		anySimpleTypeNodeValidator
+	);
 
 });
 define('xsdval/primitiveUnserializers',['underscore'], function (_) {
@@ -798,10 +793,11 @@ function (_, objTools, xsd, NodeValidator, primitiveUnserializers,
 		}
 	});
 
-	return function SimpleTypeNodeValidator () {
-		var obj = objTools.construct(simpleTypeNodeValidator, SimpleTypeNodeValidator);
-		return obj.init.apply(obj, arguments);
-	};
+	return objTools.makeConstructor(
+		function SimpleTypeNodeValidator () {}, 
+		simpleTypeNodeValidator
+	);
+
 
 });
 define('xsdval/nodeValidator/FloatNodeValidator',['underscore', 'objTools', 'xsdval/nodeValidator/SimpleTypeNodeValidator',
@@ -850,10 +846,10 @@ function (_, objTools, SimpleTypeNodeValidator, XmlValidationResult, XmlValidati
 		}
 	});
 
-	return function FloatNodeValidator () {
-		var obj = objTools.construct(floatNodeValidator, FloatNodeValidator);
-		return obj.init.apply(obj, arguments);
-	};
+	return objTools.makeConstructor(
+		function FloatNodeValidator () {}, 
+		floatNodeValidator
+	);
 
 });
 define('xsdval/nodeValidator/DecimalNodeValidator',['underscore', 'objTools', 'xsdval/nodeValidator/SimpleTypeNodeValidator',
@@ -924,10 +920,10 @@ function (_, objTools, SimpleTypeNodeValidator, XmlValidationResult, XmlValidati
 		}
 	});
 
-	return function DecimalNodeValidator () {
-		var obj = objTools.construct(decimalNodeValidator, DecimalNodeValidator);
-		return obj.init.apply(obj, arguments);
-	};
+	return objTools.makeConstructor(
+		function DecimalNodeValidator () {}, 
+		decimalNodeValidator
+	);
 
 });
 define('xsdval/nodeValidator/BooleanNodeValidator',['underscore', 'objTools', 'xsdval/nodeValidator/SimpleTypeNodeValidator',
@@ -971,10 +967,10 @@ function (_, objTools, SimpleTypeNodeValidator, XmlValidationResult, XmlValidati
 		}
 	});
 
-	return function BooleanNodeValidator () {
-		var obj = objTools.construct(booleanNodeValidator, BooleanNodeValidator);
-		return obj.init.apply(obj, arguments);
-	};
+	return objTools.makeConstructor(
+		function BooleanNodeValidator () {}, 
+		booleanNodeValidator
+	);
 
 });
 define('xsdval/nodeValidator/DateTimeNodeValidator',['underscore', 'objTools', 'xsdval/nodeValidator/SimpleTypeNodeValidator',
@@ -1023,10 +1019,10 @@ function (_, objTools, SimpleTypeNodeValidator, XmlValidationResult, XmlValidati
 		}
 	});
 
-	return function DateTimeNodeValidator () {
-		var obj = objTools.construct(dateTimeNodeValidator, DateTimeNodeValidator);
-		return obj.init.apply(obj, arguments);
-	};
+	return objTools.makeConstructor(
+		function DateTimeNodeValidator () {}, 
+		dateTimeNodeValidator
+	);
 
 });
 define('xsdval/nodeValidator/TimeNodeValidator',['underscore', 'objTools', 'xsdval/nodeValidator/SimpleTypeNodeValidator',
@@ -1075,10 +1071,10 @@ function (_, objTools, SimpleTypeNodeValidator, XmlValidationResult, XmlValidati
 		}
 	});
 
-	return function TimeNodeValidator () {
-		var obj = objTools.construct(timeNodeValidator, TimeNodeValidator);
-		return obj.init.apply(obj, arguments);
-	};
+	return objTools.makeConstructor(
+		function TimeNodeValidator () {}, 
+		timeNodeValidator
+	);
 
 });
 define('xsdval/nodeValidator/DateNodeValidator',['underscore', 'objTools', 'xsdval/nodeValidator/SimpleTypeNodeValidator',
@@ -1127,10 +1123,10 @@ function (_, objTools, SimpleTypeNodeValidator, XmlValidationResult, XmlValidati
 		}
 	});
 
-	return function DateNodeValidator () {
-		var obj = objTools.construct(dateNodeValidator, DateNodeValidator);
-		return obj.init.apply(obj, arguments);
-	};
+	return objTools.makeConstructor(
+		function DateNodeValidator () {}, 
+		dateNodeValidator
+	);
 
 });
 define('xsdval/nodeValidator/HexBinaryNodeValidator',['underscore', 'objTools', 'xsdval/nodeValidator/SimpleTypeNodeValidator',
@@ -1233,10 +1229,10 @@ function (_, objTools, SimpleTypeNodeValidator, XmlValidationResult, XmlValidati
 		}
 	});
 
-	return function HexBinaryNodeValidator () {
-		var obj = objTools.construct(hexBinaryNodeValidator, HexBinaryNodeValidator);
-		return obj.init.apply(obj, arguments);
-	};
+	return objTools.makeConstructor(
+		function HexBinaryNodeValidator () {}, 
+		hexBinaryNodeValidator
+	);
 
 });
 define('xsdval/nodeValidator/StringNodeValidator',['underscore', 'objTools', 'xsdval/nodeValidator/SimpleTypeNodeValidator',
@@ -1301,10 +1297,10 @@ function (_, objTools, SimpleTypeNodeValidator, XmlValidationResult, XmlValidati
 		}
 	});
 
-	return function StringNodeValidator () {
-		var obj = objTools.construct(stringNodeValidator, StringNodeValidator);
-		return obj.init.apply(obj, arguments);
-	};
+	return objTools.makeConstructor(
+		function StringNodeValidator () {}, 
+		stringNodeValidator
+	);
 
 });
 define('xsdval/NodeValidatorFactory',['underscore', 'objTools', 'xsd', 
@@ -1406,10 +1402,10 @@ function (_, objTools, xsd, NodeValidator, ComplexTypeNodeValidator, AnyTypeNode
 		'boolean': BooleanNodeValidator
 	};
 
-	return function NodeValidatorFactory () {
-		var obj = objTools.construct(nodeValidatorFactory, NodeValidatorFactory);
-		return obj.init.apply(obj, arguments);
-	};
+	return objTools.makeConstructor(
+		function NodeValidatorFactory () {}, 
+		nodeValidatorFactory
+	);
 
 });
 define('xsdval/XmlValidator',['objTools', 'xsdval/XsdLibrary', 'xsdval/NodeValidatorFactory'],
@@ -1459,10 +1455,7 @@ function (objTools, XsdLibrary, NodeValidatorFactory) {
 		}
 	};
 
-	return function XmlValidator () {
-		var obj = objTools.construct(xmlValidator, XmlValidator);
-		return obj.init.apply(obj, arguments);
-	};
+	return objTools.makeConstructor(function XmlValidator () {}, xmlValidator);
 	
 });
 define('xsdvalidator',['xsdval/XmlValidator', 'wgxpath'], 

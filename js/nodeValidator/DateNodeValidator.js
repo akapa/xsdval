@@ -44,9 +44,9 @@ function (_, objTools, SimpleTypeNodeValidator, XmlValidationResult, XmlValidati
 		}
 	});
 
-	return function DateNodeValidator () {
-		var obj = objTools.construct(dateNodeValidator, DateNodeValidator);
-		return obj.init.apply(obj, arguments);
-	};
+	return objTools.makeConstructor(
+		function DateNodeValidator () {}, 
+		dateNodeValidator
+	);
 
 });

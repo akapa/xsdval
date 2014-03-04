@@ -27,9 +27,9 @@ function (_, objTools, xsd, NodeValidator, XmlValidationResult, XmlValidationErr
 		}
 	});
 
-	return function AnyTypeNodeValidator () {
-		var obj = objTools.construct(anyTypeNodeValidator, AnyTypeNodeValidator);
-		return obj.init.apply(obj, arguments);
-	};
+	return objTools.makeConstructor(
+		function AnyTypeNodeValidator () {}, 
+		anyTypeNodeValidator
+	);
 
 });

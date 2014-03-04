@@ -43,9 +43,9 @@ define(['underscore', 'objTools'], function (_, objTools) {
 		}
 	};
 
-	return function XmlValidationResult () {
-		var obj = objTools.construct(xmlValidationResult, XmlValidationResult);
-		return obj.init.apply(obj, arguments);
-	};
+	return objTools.makeConstructor(
+		function XmlValidationResult () {}, 
+		xmlValidationResult
+	);
 
 });

@@ -60,9 +60,9 @@ function (_, objTools, SimpleTypeNodeValidator, XmlValidationResult, XmlValidati
 		}
 	});
 
-	return function StringNodeValidator () {
-		var obj = objTools.construct(stringNodeValidator, StringNodeValidator);
-		return obj.init.apply(obj, arguments);
-	};
+	return objTools.makeConstructor(
+		function StringNodeValidator () {}, 
+		stringNodeValidator
+	);
 
 });

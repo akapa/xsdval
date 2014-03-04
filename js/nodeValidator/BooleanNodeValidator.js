@@ -39,9 +39,9 @@ function (_, objTools, SimpleTypeNodeValidator, XmlValidationResult, XmlValidati
 		}
 	});
 
-	return function BooleanNodeValidator () {
-		var obj = objTools.construct(booleanNodeValidator, BooleanNodeValidator);
-		return obj.init.apply(obj, arguments);
-	};
+	return objTools.makeConstructor(
+		function BooleanNodeValidator () {}, 
+		booleanNodeValidator
+	);
 
 });
