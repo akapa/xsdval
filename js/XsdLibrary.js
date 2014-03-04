@@ -5,7 +5,6 @@ function (_, objTools, Library, xsd, basetypesXsd) {
 	 * A basic library/collection used to store and retrieve items.
 	 * @external Library
 	 */
-
 	var xsdLibrary = objTools.make(Library, 
 	/**
 	 * @lends XsdLibrary.prototype
@@ -94,8 +93,5 @@ function (_, objTools, Library, xsd, basetypesXsd) {
 		}
 	});
 
-	return function XsdLibrary () {
-		var obj = objTools.construct(xsdLibrary, XsdLibrary);
-		return obj.init.apply(obj, arguments);
-	};
+	return objTools.makeConstructor(function XsdLibrary () {}, xsdLibrary);
 });

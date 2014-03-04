@@ -16,10 +16,10 @@ requirejs.config({
 	}
 });
 
-requirejs(['underscore', 'xml', 'xsdvalidator'],
-function (_, xml, XmlValidator) {
+requirejs(['underscore', 'xml', 'xsdvalidator', 'Library'],
+function (_, xml, XmlValidator, Library) {
 
-	var doValidate = function () {
+	/*var doValidate = function () {
 		var xsd = xml.parseToDom(document.getElementById('xsd').value);
 		var dom = xml.parseToDom(document.getElementById('show').value);
 		console.group('XML Validation on ', dom, ' with ', xsd);
@@ -34,6 +34,8 @@ function (_, xml, XmlValidator) {
 		console.groupEnd();
 	};
 	doValidate();
-	document.getElementById('validate').addEventListener('click', doValidate);
+	document.getElementById('validate').addEventListener('click', doValidate);*/
+	var x = new XmlValidator();
+	console.log(x.xsdLibrary, x.xsdLibrary instanceof Library);
 
 });

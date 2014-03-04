@@ -1,6 +1,21 @@
 define(function () {
 
-	var xml = {
+	/**
+	 * @namespace xml
+	 * @desc A set of useful methods for XML DOM manipulation/traversal. Can be used as a compatibility layer.
+	 */
+	var xml = 
+	/**
+	 * @lends xml
+	 */
+	{
+		/**
+		 * Create a new XML DOM document.
+		 * @param {string} name - The element name for the main element in the document (for example `schema`).
+		 * @param {Object.<string, string>} namespaces - The namespaces to define on the main element. They key is short notation (like `xs`), the value is the namespace URI.
+		 * @param {string} [prefix] - The prefix to be used before the main element's name (for example `xs` to get `xs:schema`).
+		 * @returns {Document}
+		 */
 		createDocument: function (name, namespaces, prefix) {
 			var qname = prefix ? [prefix, name].join(':') : name;
 			var doc = document.implementation.createDocument(namespaces[0], qname, null);
@@ -13,6 +28,11 @@ define(function () {
 			});
 			return doc;
 		},
+		/**
+		 * Parse an XML string to a DOM document.
+		 * @param {string} s - A string containing valid XML.
+		 * @returns {Document}
+		 */
 		parseToDom: function (s) {
 			if (typeof window.DOMParser != "undefined") {
 		        return (new window.DOMParser()).parseFromString(s, "text/xml");
@@ -22,18 +42,40 @@ define(function () {
 			    xmlDoc.loadXML(s);
 			    return xmlDoc;
 			} else {
-			    throw new Error("No XML parser found");
+			    throw new Error("No XML parser found.");
 			}
 		},
+		/**
+		 * Serialize a DOM into an XML string.
+		 * @param {Element} dom - A DOM element/document.
+		 * @returns {string} The XML representation of the given DOM.
+		 */
 		serializeToString: function (dom) {
 			return new XMLSerializer().serializeToString(dom);
 		},
+		/**
+		 * Returns the `textContent` of the given node.
+		 * @param {Element} node - A DOM element.
+		 * @returns {string}
+		 */
 		getNodeText: function (node) {
 			return node.textContent;
 		},
+		/**
+		 * Sets the `textContent` of the given node.
+		 * @param {Element} node - A DOM element.
+		 * @param {string} value - The new text content.
+		 */
 		setNodeText: function (node, value) {
 			node.textContent = value;
 		},
+		/**
+		 * Returns the closest ancestor of the given node with the given namespace and name.
+		 * @param {Element} node - A DOM element.
+		 * @param {string} namespace - The namespace URI to look for.
+		 * @param {string} tagname - The tag name to look for.
+		 * @returns {Element|null}
+		 */
 		getClosestAncestor: function (node, namespace, tagname) {
 			var node = node.parentElement;
 			while (!(node.namespaceURI === namespace && node.localName === tagname)) {
@@ -44,6 +86,12 @@ define(function () {
 			}
 			return node;
 		},
+		/**
+		 * Formats an XML string to be readable by humans, adding identation.
+		 * @param {string} xml - A valid XML string.
+		 * @param {number} [spaces=4] - The number of spaces to use for one level of indentation.
+		 * @returns {string}
+		 */
 		formatString: function (xml, spaces) {
 		    xml = xml.replace(/(>)(<)(\/*)/g, '$1\r\n$2$3');
 		    spaces = spaces || 4;
