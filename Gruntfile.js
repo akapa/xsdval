@@ -25,9 +25,17 @@ module.exports = function(grunt) {
               wgxpath: 'lib/wgxpath',
               xsdval: '.'
           },
-          name: 'xsdvalidator',
+          name: 'XmlValidator',
+          skipModuleInsertion: false,
           optimize: 'none',
-          out: 'dist/xsdvalidator.js'
+          out: 'dist/xsdvalidator.js',
+          onBuildWrite: function (moduleName, path, contents) {
+            return module.require('amdclean').clean(contents);
+          },
+          wrap: {
+            startFile: 'js/dist_start.js.frag',
+            endFile: 'js/dist_end.js.frag'
+          }
         }
       }
     },

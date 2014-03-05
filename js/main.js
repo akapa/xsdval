@@ -16,7 +16,7 @@ requirejs.config({
 	}
 });
 
-requirejs(['underscore', 'xml', 'xsdvalidator', 'Library'],
+requirejs(['underscore', 'xml', 'XmlValidator', 'Library'],
 function (_, xml, XmlValidator, Library) {
 
 	var doValidate = function () {
@@ -36,6 +36,5 @@ function (_, xml, XmlValidator, Library) {
 	doValidate();
 	document.getElementById('validate').addEventListener('click', doValidate);
 	var x = new XmlValidator();
-	console.log(x.xsdLibrary, x.xsdLibrary instanceof Library);
 
 });
