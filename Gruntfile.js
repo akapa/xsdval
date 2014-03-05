@@ -3,13 +3,6 @@ module.exports = function(grunt) {
   // Project configuration.
   grunt.initConfig({
     pkg: grunt.file.readJSON('bower.json'),
-    karma: {
-      unit: {
-        configFile: 'karma.conf.js',
-        background: true,
-        autoWatch: false
-      }
-    },
     requirejs: {
       compile: {
         options: {
@@ -59,13 +52,6 @@ module.exports = function(grunt) {
         ignores: ['js/lib/*.js']
       },
       all: ['Gruntfile.js', 'js/*.js', 'js/nodeValidator/*.js', 'test/*.js']
-    },
-    watch: {
-      //run unit tests with karma (server needs to be already running)
-      karma: {
-        files: ["js/**/*.js", "test/*.js"],
-        tasks: ["karma:unit:run"]
-      }
     }
   });
 
