@@ -31,6 +31,11 @@ function (_, objTools, xsd, NodeValidator, ComplexTypeNodeValidator, AnyTypeNode
 			 * @member {XsdLibrary} NodeValidatorFactory#xsdLibrary
 			 */
 			this.xsdLibrary = xsdLibrary;
+			/**
+			 * Mapping nodeValidators to XSD type strings.
+			 * @member {Object} NodeValidatorFactory#strMappings
+			 */
+			this.strMappings = strMappings;
 			return this;
 		},
 		/**
