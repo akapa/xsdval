@@ -20,7 +20,8 @@
         "mapping": [
           { "bower_components/wgxpath/index.js": "wgxpath.js" }
         ]
-      }
+      },
+      "requirejs-text" : "bower_components/requirejs-text/text.js"
     }
   },
   "keywords": [
