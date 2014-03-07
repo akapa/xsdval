@@ -1,4 +1,4 @@
-define(['objTools', 'xsdval/XsdLibrary', 'xsdval/NodeValidatorFactory', 'wgxpath'],
+define(['objTools', 'XsdLibrary', 'xsdval/NodeValidatorFactory', 'wgxpath'],
 function (objTools, XsdLibrary, NodeValidatorFactory) {
 
 	/**

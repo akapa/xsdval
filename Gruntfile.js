@@ -13,6 +13,7 @@ module.exports = function(grunt) {
               text: 'lib/text',
               xsd: 'lib/xsd',
               xml: 'lib/xml',
+              Library: 'lib/Library',
               XsdLibrary: 'lib/XsdLibrary',
               objTools: 'lib/objTools',
               wgxpath: 'lib/wgxpath',
@@ -34,7 +35,7 @@ module.exports = function(grunt) {
     },
     jsdoc: {
       dist: {
-        src: ["./js/", "./js/nodeValidator"],
+        src: ["./js/", "./js/nodeValidator", './js/XsdLibrary', 'README.md'],
         options: {
           destination: "./docs/",
           tags: {
