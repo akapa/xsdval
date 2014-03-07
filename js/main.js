@@ -2,10 +2,9 @@ requirejs.config({
 	paths: {
 		'xsdval': '.',
 		'underscore': 'lib/underscore',
-        'text': 'lib/text',
         'xsd': 'lib/xsd',
         'xml': 'lib/xml',
-        'Library': 'lib/Library',
+        'XsdLibrary': 'lib/XsdLibrary',
         'objTools': 'lib/objTools',
         'wgxpath': 'lib/wgxpath'
     },
@@ -16,8 +15,8 @@ requirejs.config({
 	}
 });
 
-requirejs(['underscore', 'xml', 'XmlValidator', 'Library'],
-function (_, xml, XmlValidator, Library) {
+requirejs(['underscore', 'xml', 'XmlValidator'],
+function (_, xml, XmlValidator) {
 
 	var doValidate = function () {
 		var xsd = xml.parseToDom(document.getElementById('xsd').value);
@@ -35,6 +34,5 @@ function (_, xml, XmlValidator, Library) {
 	};
 	doValidate();
 	document.getElementById('validate').addEventListener('click', doValidate);
-	var x = new XmlValidator();
 
 });
