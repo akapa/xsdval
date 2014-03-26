@@ -1,4 +1,4 @@
-define(['xsdval/XmlValidator', 'xsdval/XsdLibrary', 'xsdval/NodeValidatorFactory',
+define(['xsdval/XmlValidator', 'XsdLibrary', 'xsdval/NodeValidatorFactory',
 	'xsdval/XmlValidationResult', 'xsd'], 
 function (XmlValidator, XsdLibrary, NodeValidatorFactory, XmlValidationResult, xsd) {
 

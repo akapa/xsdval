@@ -1,5 +1,5 @@
 define(['xsdval/NodeValidatorFactory', 'xsdval/nodeValidator/ComplexTypeNodeValidator', 
-	'xsdval/nodeValidator/DecimalNodeValidator', 'xsdval/XsdLibrary', 'xsd'], 
+	'xsdval/nodeValidator/DecimalNodeValidator', 'XsdLibrary', 'xsd'], 
 function (NodeValidatorFactory, ComplexTypeNodeValidator, DecimalNodeValidator, 
 	XsdLibrary, xsd) {
 

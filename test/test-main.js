@@ -16,6 +16,7 @@ requirejs.config({
 		'xsd': 'lib/xsd',
 		'xml': 'lib/xml',
 		'Library': 'lib/Library',
+		'XsdLibrary': 'lib/XsdLibrary',
 		'objTools': 'lib/objTools',
 		'wgxpath': 'lib/wgxpath'
 	},

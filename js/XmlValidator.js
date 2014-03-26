@@ -9,17 +9,17 @@ function (objTools, XsdLibrary, NodeValidatorFactory) {
 		 * @constructor XmlValidator
 		 * @classdesc Can be used to validate an XML document/element against a set of XSD documents.
 		 */
-		init: function () {
+		init: function (xsdLibrary, nodeValidatorFactory) {
 			/**
 			 * The validation library that contains XSD documents.
 			 * @member {XsdLibrary} XmlValidator#xsdLibrary
 			 */
-			this.xsdLibrary = new XsdLibrary();
+			this.xsdLibrary = xsdLibrary || new XsdLibrary();
 			/**
 			 * The factory used to get validator objects for certain types.
 			 * @member {NodeValidatorFactory} XmlValidator#nodeValidatorFactory
 			 */
-			this.nodeValidatorFactory = new NodeValidatorFactory(this.xsdLibrary);
+			this.nodeValidatorFactory = nodeValidatorFactory || new NodeValidatorFactory(this.xsdLibrary);
 			return this;
 		},
 		/**

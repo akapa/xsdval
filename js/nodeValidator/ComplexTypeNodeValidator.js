@@ -30,7 +30,9 @@ function (_, objTools, xsd, NodeValidator, XmlValidationResult, XmlValidationErr
 				}
 			}
 			else {
-				var typeDef = this.xsdLibrary.findTypeDefinitionFromNodeAttr(this.definition, 'type');
+                var typeDef = this.definition.getAttribute('type') ?
+                    this.xsdLibrary.findTypeDefinitionFromNodeAttr(this.definition, 'type') :
+                    this.definition.children[0];
 				var xsdNow = this.getFirstElement(typeDef);
 				do {
 					res.add(this.validateChild(xsdNow));
