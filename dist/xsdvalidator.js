@@ -59,7 +59,7 @@ var xsdval_nodeValidator_ComplexTypeNodeValidator = function (_, objTools, xsd, 
                             res.add(new XmlValidationError(elem, this.definition, 'nillable'));
                         }
                     } else {
-                        var typeDef = this.xsdLibrary.findTypeDefinitionFromNodeAttr(this.definition, 'type');
+                        var typeDef = this.definition.getAttribute('type') ? this.xsdLibrary.findTypeDefinitionFromNodeAttr(this.definition, 'type') : this.definition.children[0];
                         var xsdNow = this.getFirstElement(typeDef);
                         do {
                             res.add(this.validateChild(xsdNow));
@@ -596,9 +596,9 @@ var xsdval_NodeValidatorFactory = function (_, objTools, xsd, NodeValidator, Com
     }(underscore, objTools, xsd, xsdval_nodeValidator_NodeValidator, xsdval_nodeValidator_ComplexTypeNodeValidator, xsdval_nodeValidator_AnyTypeNodeValidator, xsdval_nodeValidator_AnySimpleTypeNodeValidator, xsdval_nodeValidator_FloatNodeValidator, xsdval_nodeValidator_DecimalNodeValidator, xsdval_nodeValidator_BooleanNodeValidator, xsdval_nodeValidator_DateTimeNodeValidator, xsdval_nodeValidator_TimeNodeValidator, xsdval_nodeValidator_DateNodeValidator, xsdval_nodeValidator_HexBinaryNodeValidator, xsdval_nodeValidator_StringNodeValidator);
 var XmlValidator = function (objTools, XsdLibrary, NodeValidatorFactory, wgxpath) {
         var xmlValidator = {
-                init: function () {
-                    this.xsdLibrary = new XsdLibrary();
-                    this.nodeValidatorFactory = new NodeValidatorFactory(this.xsdLibrary);
+                init: function (xsdLibrary, nodeValidatorFactory) {
+                    this.xsdLibrary = xsdLibrary || new XsdLibrary();
+                    this.nodeValidatorFactory = nodeValidatorFactory || new NodeValidatorFactory(this.xsdLibrary);
                     return this;
                 },
                 loadXsd: function (xsdDocument) {
