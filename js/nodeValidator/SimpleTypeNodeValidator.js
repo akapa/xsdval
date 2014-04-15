@@ -1,5 +1,5 @@
 define(['underscore', 'objTools', 'xsd', 'xsdval/nodeValidator/NodeValidator',
-	'xsdval/primitiveUnserializers', 'xsdval/XmlValidationResult', 'xsdval/XmlValidationError'],
+	'primitiveUnserializers', 'xsdval/XmlValidationResult', 'xsdval/XmlValidationError'],
 function (_, objTools, xsd, NodeValidator, primitiveUnserializers,
 	XmlValidationResult, XmlValidationError) {
 	

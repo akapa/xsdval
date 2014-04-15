@@ -10,7 +10,7 @@ Uses:
  - [Underscore.js](http://underscorejs.org/)
  - [wicked-good-xpath](https://code.google.com/p/wicked-good-xpath/)
  - [requirejs-text](https://github.com/requirejs/text)
- - Some of my own projects: [kapa-xsd](https://github.com/bazmegakapa/kapa-xsd), [kapa-objTools](https://github.com/bazmegakapa/), [kapa-Library](kapa-Library).
+ - Some of my own projects: [kapa-xsd](https://github.com/bazmegakapa/kapa-xsd), [kapa-objTools](https://github.com/bazmegakapa/kapa-objTools), [kapa-Library](https://github.com/bazmegakapa/kapa-Library), [kapa-primiveUnserializers](https://github.com/bazmegakapa/kapa-primitiveUnserializers).
 
 ##Tests
 

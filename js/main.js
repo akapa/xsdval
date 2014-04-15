@@ -4,6 +4,8 @@ requirejs.config({
 		'underscore': 'lib/underscore',
         'xsd': 'lib/xsd',
         'xml': 'lib/xml',
+        'primitiveUnserializers': 'lib/primitiveUnserializers',
+        'Library': 'lib/Library',
         'XsdLibrary': 'lib/XsdLibrary',
         'objTools': 'lib/objTools',
         'wgxpath': 'lib/wgxpath'

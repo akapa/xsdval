@@ -9,7 +9,8 @@
     "wgxpath": "https://wicked-good-xpath.googlecode.com/files/wgxpath.install.js",
     "xsd": "bazmegakapa/kapa-xsd",
     "XsdLibrary": "bazmegakapa/kapa-XsdLibrary",
-    "objTools": "bazmegakapa/kapa-objTools"
+    "objTools": "bazmegakapa/kapa-objTools",
+    "primitiveUnserializers": "bazmegakapa/kapa-primitiveUnserializers"
   },
   "install": {
     "path": {

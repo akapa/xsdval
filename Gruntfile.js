@@ -7,12 +7,13 @@ module.exports = function(grunt) {
       compile: {
         options: {
           baseUrl: 'js',
-          exclude: ['underscore', 'objTools', 'XsdLibrary', 'xml', 'xsd', 'text', 'wgxpath'],
+          exclude: ['underscore', 'objTools', 'XsdLibrary', 'xml', 'xsd', 'text', 'wgxpath', 'primitiveUnserializers'],
           paths: {
               underscore: 'lib/underscore',
               text: 'lib/text',
               xsd: 'lib/xsd',
               xml: 'lib/xml',
+              primitiveUnserializers: 'lib/primitiveUnserializers',
               Library: 'lib/Library',
               XsdLibrary: 'lib/XsdLibrary',
               objTools: 'lib/objTools',

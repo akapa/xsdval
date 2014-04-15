@@ -1,5 +1,5 @@
-define(['underscore', 'objTools', 'XsdLibrary', 'xsd', 'wgxpath'],
-function (underscore, objTools, XsdLibrary, xsd) {
+define(['underscore', 'objTools', 'XsdLibrary', 'xsd', 'primitiveUnserializers', 'wgxpath'],
+function (underscore, objTools, XsdLibrary, primitiveUnserializers, xsd) {
 
 var xsdval_XmlValidationResult = function (_, objTools) {
         var xmlValidationResult = {
@@ -168,64 +168,6 @@ var xsdval_nodeValidator_AnySimpleTypeNodeValidator = function (_, objTools, xsd
         return objTools.makeConstructor(function anySimpleTypeNodeValidator() {
         }, anySimpleTypeNodeValidator);
     }(underscore, objTools, xsd, xsdval_nodeValidator_NodeValidator, xsdval_XmlValidationResult, xsdval_XmlValidationError);
-var xsdval_primitiveUnserializers = function (_) {
-        return {
-            'boolean': function (s) {
-                return [
-                    'true',
-                    '1'
-                ].indexOf(s) !== -1;
-            },
-            'float': function (s) {
-                if (s === 'INF') {
-                    return Number.POSITIVE_INFINITY;
-                }
-                if (s === '-INF') {
-                    return Number.NEGATIVE_INFINITY;
-                }
-                return parseFloat(s);
-            },
-            'decimal': function (s) {
-                return parseFloat(s);
-            },
-            'int': function (s) {
-                return parseInt(s, 10);
-            },
-            'integer': function (s) {
-                return this.int(s);
-            },
-            'dateTime': function (s) {
-                return new Date(s);
-            },
-            'date': function (s) {
-                return new Date(s);
-            },
-            'time': function (s) {
-                var time = s.match(/(\d{2}):(\d{2}):(\d{2}).(\d{3})/);
-                var d = new Date();
-                d.setUTCHours(time[1]);
-                d.setUTCMinutes(time[2]);
-                d.setUTCSeconds(time[3]);
-                d.setUTCMilliseconds(time[4]);
-                return d;
-            },
-            'gYearMonth': function (s) {
-                return new Date(s);
-            },
-            'gMonthDay': function (s) {
-                return new Date('2004-' + s);
-            },
-            'gYear': function (s) {
-                return this.int(s);
-            },
-            'gDay': function (s) {
-                return this.int(s);
-            },
-            'gMonth': function (s) {
-                return this.int(s);
-            }
-        };
-    }(underscore);
 var xsdval_nodeValidator_SimpleTypeNodeValidator = function (_, objTools, xsd, NodeValidator, primitiveUnserializers, XmlValidationResult, XmlValidationError) {
         var simpleTypeNodeValidator = objTools.make(NodeValidator, {
                 type: '',
@@ -347,7 +289,7 @@ var xsdval_nodeValidator_SimpleTypeNodeValidator = function (_, objTools, xsd, N
             });
         return objTools.makeConstructor(function SimpleTypeNodeValidator() {
         }, simpleTypeNodeValidator);
-    }(underscore, objTools, xsd, xsdval_nodeValidator_NodeValidator, xsdval_primitiveUnserializers, xsdval_XmlValidationResult, xsdval_XmlValidationError);
+    }(underscore, objTools, xsd, xsdval_nodeValidator_NodeValidator, primitiveUnserializers, xsdval_XmlValidationResult, xsdval_XmlValidationError);
 var xsdval_nodeValidator_FloatNodeValidator = function (_, objTools, SimpleTypeNodeValidator, XmlValidationResult, XmlValidationError) {
         var floatNodeValidator = objTools.make(SimpleTypeNodeValidator, {
                 type: 'float',
