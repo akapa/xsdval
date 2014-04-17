@@ -30,17 +30,15 @@ function (_, objTools, xsd, NodeValidator, XmlValidationResult, XmlValidationErr
 				}
 			}
 			else {
-                var typeDef = this.definition.getAttribute('type') ?
-                    this.xsdLibrary.findTypeDefinitionFromNodeAttr(this.definition, 'type') :
-                    this.definition.children[0];
-				var xsdNow = this.getFirstElement(typeDef);
+                var type = this.xsdLibrary.findElementType(this.definition);
+				var xsdNow = this.getFirstElement(type);
 				do {
 					res.add(this.validateChild(xsdNow));
 					xsdNow = this.getNextElement(xsdNow);
 				} while (xsdNow);
 
 				//check assertions
-				var assert = typeDef.getElementsByTagNameNS(xsd.xs, 'assert');
+				var assert = type.getElementsByTagNameNS(xsd.xs, 'assert');
 				if (assert.length) {
 					res.add(this.validateAssert(assert));
 				}
