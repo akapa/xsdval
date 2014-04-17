@@ -29,6 +29,7 @@ function (_, objTools, xsd, NodeValidator, XmlValidationResult, XmlValidationErr
 					new XmlValidationError(this.node, this.definition, 'simpleType')
 				]);
 			}
+			//NEEDS TO BE REWRITTEN!!!
 			var validator = this.validatorFactory.getValidator(typeDef, this.node, type);
 			return validator.validate();
 		}

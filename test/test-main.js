@@ -18,6 +18,7 @@ requirejs.config({
 		'Library': 'lib/Library',
 		'XsdLibrary': 'lib/XsdLibrary',
 		'objTools': 'lib/objTools',
+		'primitiveUnserializers': 'lib/primitiveUnserializers',
 		'wgxpath': 'lib/wgxpath'
 	},
 	shim: {

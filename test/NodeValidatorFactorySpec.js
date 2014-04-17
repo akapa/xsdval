@@ -18,7 +18,7 @@ function (NodeValidatorFactory, ComplexTypeNodeValidator, DecimalNodeValidator,
 			nvf = new NodeValidatorFactory(new XsdLibrary([schema]));
 		});
 
-		describe("getXsdDefinition", function () {
+		/*describe("getXsdDefinition", function () {
 
 			it("calls xsdLibrary.findTypeDefinition() when type is given and returns node or null", function() {
 
@@ -54,7 +54,7 @@ function (NodeValidatorFactory, ComplexTypeNodeValidator, DecimalNodeValidator,
 
 			});
 
-		});
+		});*/
 
 		describe("getValidator", function () {
 
@@ -85,18 +85,6 @@ function (NodeValidatorFactory, ComplexTypeNodeValidator, DecimalNodeValidator,
 					.toEqual(jasmine.any(DecimalNodeValidator));
 
 				elem.removeChild(st);
-
-			});
-
-			it("returns a kind of SimpleTypeNodeValidator for base types", function() {
-
-				var type = {
-					namespaceURI: xsdns,
-					name: 'decimal'
-				};
-
-				expect(nvf.getValidator(elem, null, type))
-					.toEqual(jasmine.any(DecimalNodeValidator));
 
 			});
 

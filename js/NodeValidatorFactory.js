@@ -63,18 +63,6 @@ function (_, objTools, xsd, NodeValidator, ComplexTypeNodeValidator, AnyTypeNode
 
 			console.warn('No suitable validator found for "', xsdElement, '".');
 			return new NodeValidator(node, xsdElement, this);
-		},
-		/**
-		 * Attempts to find an XSD type definition either by the given type object, or embedded in the given XSD Element.
-		 * @param {Element} xsdElement - An XSD &lt;element&gt; node.
-		 * @param {{ namespaceURI: string, name: string }} type - A type object (namespaceURI and name).
-		 * @returns {Element|null}
-		 */
-		getXsdDefinition: function (xsdElement, type) {
-			var node = type ?
-				this.xsdLibrary.findTypeDefinition(type.namespaceURI, type.name) :
-				xsdElement.children[0];
-			return node || null;
 		}
 	};
 
