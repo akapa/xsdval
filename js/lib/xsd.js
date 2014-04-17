@@ -45,7 +45,7 @@ define(['objTools', 'xml'], function (objTools, xml) {
 			var selector = 
 				 'complexType[name="' + name + '"],'
 				+ 'simpleType[name="' + name + '"]';
-			return doc.querySelectorAll(selector);
+			return doc.querySelectorAll(selector)[0];
 		},
 		findElementType: function (elem) {
 			var tdef = this.getTypeFromNodeAttr(elem, 'type');
@@ -116,18 +116,6 @@ define(['objTools', 'xml'], function (objTools, xml) {
 				max = parseInt(max, 10);
 			}
 			return { min: min, max: max	};
-		},
-		/**
-		 * Finds the type that is restricted by the given element (through the use of &lt;restriction&gt;).
-		 * @param {Element} node - The element whose parent type we want to know.
-		 * @returns {{ namespaceURI: string, name: string } | null} The parent type of the element - an object with a `namespaceURI` and `name` property.
-		 */
-		getRestrictedType: function (node) {
-			var	element = _(node.children).find(function (child) {
-				return child.namespaceURI === xsd.xs
-					&& child.localName === 'restriction';
-			});
-			return element ? this.getTypeFromNodeAttr(element, 'base') : null;
 		}
 	});
 

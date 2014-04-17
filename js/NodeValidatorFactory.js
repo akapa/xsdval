@@ -42,33 +42,23 @@ function (_, objTools, xsd, NodeValidator, ComplexTypeNodeValidator, AnyTypeNode
 		 * Finds an appropriate NodeValidator object.
 		 * @param {Element} xsdElement - The XSD Element that should be used to validate the XML node.
 		 * @param {Element} node - The XML node that want to validate with the resulting validator.
-		 * @param {string} [type] - The type of the node can be overridden, by default an attempt will be made to resolve it based on the XSD node.
+		 * @param {Element} [type] - The XSD type node to use if you want to override the type found based on the XSD Element. 
 		 * @returns {NodeValidator} A NodeValidator that is capable of validating the given node.
 		 */
 		getValidator: function (xsdElement, node, type) {
-			//looking up a typeDefinition (complexType, simpleType or null)
-			type = type || xsd.getTypeFromNodeAttr(xsdElement, 'type');
-			var xsdNode = this.getXsdDefinition(xsdElement, type);
+			type = type || this.xsdLibrary.findElementType(xsdElement);
 
-			//if it is a base simple type, choose a pre-defined validator
-			if (xsdNode === null) {
-				if (type && type.namespaceURI === xsd.xs && type.name in strMappings) {
-					return new strMappings[type.name](node, xsdElement, this);
-				}
-			}
-			//simple type
-			else if (xsdNode.namespaceURI === xsd.xs && xsdNode.localName === 'simpleType') {
-				var basetype = this.xsdLibrary.findBaseTypeFor(xsdNode);
-				if (basetype in strMappings) {
-					return new strMappings[basetype](node, xsdElement, this);
-				}
-			}
-			//complex type
-			else if (xsdNode.namespaceURI === xsd.xs && xsdNode.localName === 'complexType') {
-				if (xsdNode.getAttribute('abstract') === 'true') {
+			if (type.localName === 'complexType') {
+				if (type.getAttribute('abstract') === 'true') {
 					throw new TypeError('An abstract type should only be used for extension/restriction.');
 				}
 				return new ComplexTypeNodeValidator(node, xsdElement, this);
+			}
+			else if (type.localName === 'simpleType') {
+				var basetype = this.xsdLibrary.findBaseTypeFor(type);
+				if (basetype in strMappings) {
+					return new strMappings[basetype](node, xsdElement, this);
+				}
 			}
 
 			console.warn('No suitable validator found for "', xsdElement, '".');
