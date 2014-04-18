@@ -20,7 +20,8 @@ define(['underscore', 'objTools'], function (_, objTools) {
 			this.failingNode = failingNode;
 			/**
 			 * The XSD node containing the validation rule that was not passed.
-			 * @member {Element} failedXsdNode
+			 * Can be an array if an enumeration facet was failed.
+			 * @member {Element|Element[]} failedXsdNode
 			 * @memberof XmlValidationError#
 			 */
 			this.failedXsdNode = failedXsdNode;

@@ -42,15 +42,6 @@ function (_, objTools, xsd, NodeValidator, primitiveUnserializers,
 			return [];
 		},
 		/**
-		 * Receives a map of facets and returns only those that are allowed to be used by this validator.
-		 * @param {Object.<string, *>} extensions - The facets you want to filter.
-		 * @returns {Object.<string, *>} The filtered facets that are allowed to be used.
-		 * @protected
-		 */
-		getFacets: function (extensions) {
-			return _(extensions).pick(this.getAllowedFacets());
-		},
-		/**
 		 * Validates the XML node against the XSD node. Validates by base type, base facets and facets given in the XSD node.
 		 * @returns {XmlValidationResult}
 		 */
@@ -124,60 +115,22 @@ function (_, objTools, xsd, NodeValidator, primitiveUnserializers,
 		 * @protected
 		 */
 		validateFacets: function () {
-			var errors = [];	
-			var type = xsd.getTypeFromNodeAttr(this.definition, 'type');
-			var current = this.validatorFactory.getXsdDefinition(this.definition, type);
-			var findings, facets, enums;
-			var validatedFacets = [];
-			var facetMapper = _(function (elem) {
-				if (elem.localName === 'enumeration') {
-					enums.push(elem);
+			var errors = [];
+			var type = this.xsdLibrary.findElementType(this.definition);
+			var facets = this.xsdLibrary.collectFacets(type);
+			var allowed = this.getAllowedFacets();
+			_(facets).each(function (facet) {
+				var enumMode = _(facet).isArray();
+				var name = enumMode ? facet[0].localName : facet.localName;
+				if (allowed.indexOf(name) !== -1) {
+					var valueAttr = name === 'assertion' ? 'test' : 'value';
+					var value = !enumMode ?
+						facet.getAttribute(valueAttr) :
+						_(facet).map(function(f) { return f.getAttribute(valueAttr); });
+					errors = errors.concat(this.invokeFacetValidation(name, value, facet));
 				}
-				else return this.validateFacet(elem, validatedFacets);
-			}).bind(this);
-			while (current) {
-				facets = xsd.findRestrictingFacets(current);
-				enums = [];
-				findings = _(facets).map(facetMapper);
-				if (enums.length) {
-					findings.push(this.validateFacet(enums, validatedFacets));
-				}
-				errors = errors.concat(_(findings).compact());
-				type = xsd.getRestrictedType(current);
-				current = this.validatorFactory.getXsdDefinition(this.definition, type);
-			}
+			}, this);
 			return errors;
-		},
-		/**
-		 * Used to run validation defined by a certain facet node.
-		 * @param {Element|Array.<Element>} facetNode - The facet node to base validation on. In the case of an enumeration,  all the enumeration facet nodes should be passed as an array.
-		 * @param {string[]} validatedFacets - Facet types not to be validated. There are two exceptions: assertion facets and facet nodes having a "fixed" attribute, these will be processed anyways. This parameter is used to prevent processing facets that were overridden by a derived type definition.
-		 * @returns {XmlValidationError|undefined}
-		 * @protected
-		 */
-		validateFacet: function (facetNode, validatedFacets) {
-			var enumMode = _(facetNode).isArray();
-			var facetName = enumMode ? facetNode[0].localName : facetNode.localName;
-			var valueAttr = facetName === 'assertion' ? 'test' : 'value';
-			var facetValue = enumMode ? 
-				_(facetNode).map(function (elem) {
-					return elem.getAttribute(valueAttr);
-				}) :
-				facetNode.getAttribute(valueAttr);
-			
-			if (this.getAllowedFacets().indexOf(facetName) === -1) {
-				return;
-			}
-			
-			var fixed = enumMode ? false : facetNode.getAttribute('fixed') === 'true';
-			if (!fixed && validatedFacets.indexOf(facetName) !== -1) {
-				return;
-			}
-
-			if (facetName !== 'assertion') {
-				validatedFacets.push(facetName);
-			}
-			return this.invokeFacetValidation(facetName, facetValue, facetNode);
 		},
 		/**
 		 * Invokes the right facet validation method for the given facet type.
