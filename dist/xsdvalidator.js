@@ -1,5 +1,5 @@
 define(['underscore', 'objTools', 'XsdLibrary', 'xsd', 'primitiveUnserializers', 'wgxpath'],
-function (underscore, objTools, XsdLibrary, primitiveUnserializers, xsd) {
+function (underscore, objTools, XsdLibrary, xsd, primitiveUnserializers) {
 
 var xsdval_XmlValidationResult = function (_, objTools) {
         var xmlValidationResult = {
