@@ -54,40 +54,38 @@ var xsdval_nodeValidator_ComplexTypeNodeValidator = function (_, objTools, xsd, 
         var complexTypeNodeValidator = objTools.make(NodeValidator, {
                 validate: function () {
                     var res = new XmlValidationResult();
+                    var xsdlib = this.xsdLibrary;
                     if (this.node.getAttributeNS(xsd.xs, 'nil') === 'true') {
                         if (this.definition.getAttribute('nillable') !== 'true') {
                             res.add(new XmlValidationError(elem, this.definition, 'nillable'));
                         }
                     } else {
-                        var type = this.xsdLibrary.findElementType(this.definition);
-                        var xsdNow = this.getFirstElement(type);
-                        do {
-                            res.add(this.validateChild(xsdNow));
-                            xsdNow = this.getNextElement(xsdNow);
-                        } while (xsdNow);
-                        var assert = type.getElementsByTagNameNS(xsd.xs, 'assert');
-                        if (assert.length) {
+                        var type = xsdlib.findElementType(this.definition);
+                        _(xsdlib.getComplexTypeElements(type)).each(function (elem) {
+                            res.add(this.validateWith(elem));
+                        }, this);
+                        _(xsdlib.getComplexTypeAsserts(type)).each(function (assert) {
                             res.add(this.validateAssert(assert));
-                        }
+                        }, this);
                     }
                     return res;
                 },
-                validateChild: function (xsdNow) {
+                validateWith: function (elem) {
                     var errors = [];
-                    var xmlNow = _(this.node.children).filter(function (elem) {
-                            return elem.tagName === xsdNow.getAttribute('name');
+                    var xmlNow = _(this.node.children).filter(function (child) {
+                            return child.tagName === elem.getAttribute('name');
                         });
-                    var occurLimit = xsd.parseMinMaxOccurs(xsdNow);
+                    var occurLimit = xsd.parseMinMaxOccurs(elem);
                     if (xmlNow.length > occurLimit.max) {
-                        errors.push(new XmlValidationError(this.node, xsdNow, 'maxOccurs'));
+                        errors.push(new XmlValidationError(this.node, elem, 'maxOccurs'));
                     }
                     if (xmlNow.length < occurLimit.min) {
-                        errors.push(new XmlValidationError(this.node, xsdNow, 'minOccurs'));
+                        errors.push(new XmlValidationError(this.node, elem, 'minOccurs'));
                     }
                     if (xmlNow.length) {
-                        errors = errors.concat(this.callChildValidators(xmlNow, xsdNow));
+                        errors = errors.concat(this.callChildValidators(xmlNow, elem));
                     }
-                    return errors;
+                    return _(errors).compact();
                 },
                 callChildValidators: function (xmlNodes, xsdNode) {
                     var errors = [];
@@ -107,21 +105,6 @@ var xsdval_nodeValidator_ComplexTypeNodeValidator = function (_, objTools, xsd, 
                         }
                     });
                     return errors;
-                },
-                getFirstElement: function (xsdNode) {
-                    var elems = xsdNode.getElementsByTagNameNS(xsdNode.namespaceURI, 'element');
-                    return elems.length ? elems[0] : null;
-                },
-                getNextElement: function (childCurrent) {
-                    var next = childCurrent.nextElementSibling;
-                    if (next === null) {
-                        var extension = xsd.getClosestAncestor(childCurrent, xsd.xs, 'extension');
-                        if (extension) {
-                            var extendedType = this.xsdLibrary.findTypeDefinitionFromNodeAttr(extension, 'base');
-                            next = this.getFirstElement(extendedType);
-                        }
-                    }
-                    return next;
                 },
                 validateAssert: function (assertNodes) {
                     var errors = [];

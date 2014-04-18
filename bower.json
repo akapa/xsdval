@@ -1,6 +1,6 @@
 {
   "name": "kapa/xsdvalidator",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Validate XML against XSD in Javascript",
   "main": "dist/xsdvalidator.js",
   "dependencies": {

@@ -337,7 +337,7 @@ Uses the validator factory to spawn a fitting validator, calls it on all nodes a
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ComplexTypeNodeValidator.js.html">nodeValidator/ComplexTypeNodeValidator.js</a>, <a href="ComplexTypeNodeValidator.js.html#line86">line 86</a>
+        <a href="ComplexTypeNodeValidator.js.html">nodeValidator/ComplexTypeNodeValidator.js</a>, <a href="ComplexTypeNodeValidator.js.html#line84">line 84</a>
     </li></ul></dd>
     
     
@@ -383,187 +383,6 @@ Uses the validator factory to spawn a fitting validator, calls it on all nodes a
         
             
 <dt>
-    <h4 class="name" id="getFirstElement"><span class="type-signature">&lt;protected> </span>getFirstElement<span class="signature">()</span><span class="type-signature"> &rarr; {Element|null}</span></h4>
-    
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        Used for iteration on the XSD child elements. Will return the first element to be evaluated.
-    </div>
-    
-
-    
-    
-    
-    
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ComplexTypeNodeValidator.js.html">nodeValidator/ComplexTypeNodeValidator.js</a>, <a href="ComplexTypeNodeValidator.js.html#line116">line 116</a>
-    </li></ul></dd>
-    
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-
-    
-
-    
-    
-    
-    
-    
-    <h5>Returns:</h5>
-    
-            
-
-
-<dl>
-	<dt>
-		Type
-	</dt>
-	<dd>
-		
-<span class="param-type">Element</span>
-|
-
-<span class="param-type">null</span>
-
-
-	</dd>
-</dl>
-
-        
-    
-    
-</dd>
-
-        
-            
-<dt>
-    <h4 class="name" id="getNextElement"><span class="type-signature">&lt;protected> </span>getNextElement<span class="signature">()</span><span class="type-signature"> &rarr; {Element|null}</span></h4>
-    
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        Used for iteration on the XSD child elements. Will return the next element to be evaluated after the given element.
-Handles "extension" based inheritance. Advances to the next level of inheritance when there are no elements left on the current level.
-    </div>
-    
-
-    
-    
-    
-    
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ComplexTypeNodeValidator.js.html">nodeValidator/ComplexTypeNodeValidator.js</a>, <a href="ComplexTypeNodeValidator.js.html#line127">line 127</a>
-    </li></ul></dd>
-    
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-
-    
-
-    
-    
-    
-    
-    
-    <h5>Returns:</h5>
-    
-            
-
-
-<dl>
-	<dt>
-		Type
-	</dt>
-	<dd>
-		
-<span class="param-type">Element</span>
-|
-
-<span class="param-type">null</span>
-
-
-	</dd>
-</dl>
-
-        
-    
-    
-</dd>
-
-        
-            
-<dt>
     <h4 class="name" id="validate"><span class="type-signature"></span>validate<span class="signature">()</span><span class="type-signature"> &rarr; {<a href="XmlValidationResult.html">XmlValidationResult</a>}</span></h4>
     
     
@@ -573,7 +392,7 @@ Handles "extension" based inheritance. Advances to the next level of inheritance
     
     <div class="description">
         Validates the XML node against the XSD node.
-Handles xsi:nil (and nillable), calls <a href="ComplexTypeNodeValidator.html#validateChild">validateChild()</a> for every child and handles assertions.
+Handles xsi:nil (and nillable), calls <a href="ComplexTypeNodeValidator.html#validateWith">validateWith()</a> for every child and handles assertions.
     </div>
     
 
@@ -741,7 +560,7 @@ Handles xsi:nil (and nillable), calls <a href="ComplexTypeNodeValidator.html#val
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ComplexTypeNodeValidator.js.html">nodeValidator/ComplexTypeNodeValidator.js</a>, <a href="ComplexTypeNodeValidator.js.html#line147">line 147</a>
+        <a href="ComplexTypeNodeValidator.js.html">nodeValidator/ComplexTypeNodeValidator.js</a>, <a href="ComplexTypeNodeValidator.js.html#line114">line 114</a>
     </li></ul></dd>
     
     
@@ -787,7 +606,7 @@ Handles xsi:nil (and nillable), calls <a href="ComplexTypeNodeValidator.html#val
         
             
 <dt>
-    <h4 class="name" id="validateChild"><span class="type-signature">&lt;protected> </span>validateChild<span class="signature">(xsdNow)</span><span class="type-signature"> &rarr; {Array.&lt;<a href="XmlValidationError.html">XmlValidationError</a>>}</span></h4>
+    <h4 class="name" id="validateWith"><span class="type-signature">&lt;protected> </span>validateWith<span class="signature">(elem)</span><span class="type-signature"> &rarr; {Array.&lt;<a href="XmlValidationError.html">XmlValidationError</a>>}</span></h4>
     
     
 </dt>
@@ -830,7 +649,7 @@ Validates minOccurs/maxOccurs and calls child validators.
 	
         <tr>
             
-                <td class="name"><code>xsdNow</code></td>
+                <td class="name"><code>elem</code></td>
             
             
             <td class="type">
@@ -877,7 +696,7 @@ Validates minOccurs/maxOccurs and calls child validators.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ComplexTypeNodeValidator.js.html">nodeValidator/ComplexTypeNodeValidator.js</a>, <a href="ComplexTypeNodeValidator.js.html#line55">line 55</a>
+        <a href="ComplexTypeNodeValidator.js.html">nodeValidator/ComplexTypeNodeValidator.js</a>, <a href="ComplexTypeNodeValidator.js.html#line53">line 53</a>
     </li></ul></dd>
     
     
@@ -942,7 +761,7 @@ Validates minOccurs/maxOccurs and calls child validators.
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Fri Apr 18 2014 16:30:02 GMT+0200 (CEST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Fri Apr 18 2014 17:56:09 GMT+0200 (CEST)
 </footer>
 
 <script> prettyPrint(); </script>
