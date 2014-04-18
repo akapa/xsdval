@@ -59,13 +59,13 @@ var xsdval_nodeValidator_ComplexTypeNodeValidator = function (_, objTools, xsd, 
                             res.add(new XmlValidationError(elem, this.definition, 'nillable'));
                         }
                     } else {
-                        var typeDef = this.definition.getAttribute('type') ? this.xsdLibrary.findTypeDefinitionFromNodeAttr(this.definition, 'type') : this.definition.children[0];
-                        var xsdNow = this.getFirstElement(typeDef);
+                        var type = this.xsdLibrary.findElementType(this.definition);
+                        var xsdNow = this.getFirstElement(type);
                         do {
                             res.add(this.validateChild(xsdNow));
                             xsdNow = this.getNextElement(xsdNow);
                         } while (xsdNow);
-                        var assert = typeDef.getElementsByTagNameNS(xsd.xs, 'assert');
+                        var assert = type.getElementsByTagNameNS(xsd.xs, 'assert');
                         if (assert.length) {
                             res.add(this.validateAssert(assert));
                         }
@@ -144,7 +144,7 @@ var xsdval_nodeValidator_AnyTypeNodeValidator = function (_, objTools, xsd, Node
         var anyTypeNodeValidator = objTools.make(NodeValidator, {
                 type: 'anyType',
                 validate: function () {
-                    var type = xsd.getTypeFromNodeAttr(this.node, 'type', xsd.xsi);
+                    var type = this.xsdLibrary.findTypeDefinitionFromNodeAttr(this.node, 'type', xsd.xsi);
                     var validator = this.validatorFactory.getValidator(typeDef, this.node, type);
                     return validator.validate();
                 }
@@ -156,12 +156,11 @@ var xsdval_nodeValidator_AnySimpleTypeNodeValidator = function (_, objTools, xsd
         var anySimpleTypeNodeValidator = objTools.make(NodeValidator, {
                 type: 'anySimpleType',
                 validate: function () {
-                    var type = xsd.getTypeFromNodeAttr(this.node, 'type', xsd.xsi);
-                    var xsdNode = this.xsdLibrary.findTypeDefinition(type.namespaceURI, type.name);
-                    if (xsdNode.namespaceURI === xsd.xs && xsdNode.localName === 'complexType') {
+                    var type = this.xsdLibrary.findTypeDefinitionFromNodeAttr(this.node, 'type', xsd.xsi);
+                    if (type.namespaceURI === xsd.xs && type.localName === 'complexType') {
                         return new XmlValidationResult([new XmlValidationError(this.node, this.definition, 'simpleType')]);
                     }
-                    var validator = this.validatorFactory.getValidator(typeDef, this.node, type);
+                    var validator = this.validatorFactory.getValidator(this.definition, this.node, type);
                     return validator.validate();
                 }
             });
@@ -176,9 +175,6 @@ var xsdval_nodeValidator_SimpleTypeNodeValidator = function (_, objTools, xsd, N
                 },
                 getAllowedFacets: function () {
                     return [];
-                },
-                getFacets: function (extensions) {
-                    return _(extensions).pick(this.getAllowedFacets());
                 },
                 validate: function () {
                     var res = new XmlValidationResult();
@@ -206,47 +202,21 @@ var xsdval_nodeValidator_SimpleTypeNodeValidator = function (_, objTools, xsd, N
                 },
                 validateFacets: function () {
                     var errors = [];
-                    var type = xsd.getTypeFromNodeAttr(this.definition, 'type');
-                    var current = this.validatorFactory.getXsdDefinition(this.definition, type);
-                    var findings, facets, enums;
-                    var validatedFacets = [];
-                    var facetMapper = _(function (elem) {
-                            if (elem.localName === 'enumeration') {
-                                enums.push(elem);
-                            } else
-                                return this.validateFacet(elem, validatedFacets);
-                        }).bind(this);
-                    while (current) {
-                        facets = xsd.findRestrictingFacets(current);
-                        enums = [];
-                        findings = _(facets).map(facetMapper);
-                        if (enums.length) {
-                            findings.push(this.validateFacet(enums, validatedFacets));
+                    var type = this.xsdLibrary.findElementType(this.definition);
+                    var facets = this.xsdLibrary.collectFacets(type);
+                    var allowed = this.getAllowedFacets();
+                    _(facets).each(function (facet) {
+                        var enumMode = _(facet).isArray();
+                        var name = enumMode ? facet[0].localName : facet.localName;
+                        if (allowed.indexOf(name) !== -1) {
+                            var valueAttr = name === 'assertion' ? 'test' : 'value';
+                            var value = !enumMode ? facet.getAttribute(valueAttr) : _(facet).map(function (f) {
+                                    return f.getAttribute(valueAttr);
+                                });
+                            errors = errors.concat(this.invokeFacetValidation(name, value, facet));
                         }
-                        errors = errors.concat(_(findings).compact());
-                        type = xsd.getRestrictedType(current);
-                        current = this.validatorFactory.getXsdDefinition(this.definition, type);
-                    }
+                    }, this);
                     return errors;
-                },
-                validateFacet: function (facetNode, validatedFacets) {
-                    var enumMode = _(facetNode).isArray();
-                    var facetName = enumMode ? facetNode[0].localName : facetNode.localName;
-                    var valueAttr = facetName === 'assertion' ? 'test' : 'value';
-                    var facetValue = enumMode ? _(facetNode).map(function (elem) {
-                            return elem.getAttribute(valueAttr);
-                        }) : facetNode.getAttribute(valueAttr);
-                    if (this.getAllowedFacets().indexOf(facetName) === -1) {
-                        return;
-                    }
-                    var fixed = enumMode ? false : facetNode.getAttribute('fixed') === 'true';
-                    if (!fixed && validatedFacets.indexOf(facetName) !== -1) {
-                        return;
-                    }
-                    if (facetName !== 'assertion') {
-                        validatedFacets.push(facetName);
-                    }
-                    return this.invokeFacetValidation(facetName, facetValue, facetNode);
                 },
                 invokeFacetValidation: function (facetName, facetValue, facetNode) {
                     var method = 'validate' + facetName[0].toUpperCase() + facetName.slice(1);
@@ -495,29 +465,20 @@ var xsdval_NodeValidatorFactory = function (_, objTools, xsd, NodeValidator, Com
                     return this;
                 },
                 getValidator: function (xsdElement, node, type) {
-                    type = type || xsd.getTypeFromNodeAttr(xsdElement, 'type');
-                    var xsdNode = this.getXsdDefinition(xsdElement, type);
-                    if (xsdNode === null) {
-                        if (type && type.namespaceURI === xsd.xs && type.name in strMappings) {
-                            return new strMappings[type.name](node, xsdElement, this);
-                        }
-                    } else if (xsdNode.namespaceURI === xsd.xs && xsdNode.localName === 'simpleType') {
-                        var basetype = this.xsdLibrary.findBaseTypeFor(xsdNode);
-                        if (basetype in strMappings) {
-                            return new strMappings[basetype](node, xsdElement, this);
-                        }
-                    } else if (xsdNode.namespaceURI === xsd.xs && xsdNode.localName === 'complexType') {
-                        if (xsdNode.getAttribute('abstract') === 'true') {
+                    type = type || this.xsdLibrary.findElementType(xsdElement);
+                    if (type.localName === 'complexType') {
+                        if (type.getAttribute('abstract') === 'true') {
                             throw new TypeError('An abstract type should only be used for extension/restriction.');
                         }
                         return new ComplexTypeNodeValidator(node, xsdElement, this);
+                    } else if (type.localName === 'simpleType') {
+                        var basetype = this.xsdLibrary.findBaseTypeFor(type);
+                        if (basetype in strMappings) {
+                            return new strMappings[basetype](node, xsdElement, this);
+                        }
                     }
                     console.warn('No suitable validator found for "', xsdElement, '".');
                     return new NodeValidator(node, xsdElement, this);
-                },
-                getXsdDefinition: function (xsdElement, type) {
-                    var node = type ? this.xsdLibrary.findTypeDefinition(type.namespaceURI, type.name) : xsdElement.children[0];
-                    return node || null;
                 }
             };
         var strMappings = {
