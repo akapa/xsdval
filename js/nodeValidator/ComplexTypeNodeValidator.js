@@ -112,6 +112,7 @@ function (_, objTools, xsd, NodeValidator, XmlValidationResult, XmlValidationErr
 		 * @returns {Element|null}
 		 * @protected
 		 */
+		//SHOULD BE MOVED TO XSD LIBRARY OR REFACTORED
 		getFirstElement: function (xsdNode) {
 			var elems = xsdNode.getElementsByTagNameNS(xsdNode.namespaceURI, 'element');
 			return elems.length ? elems[0] : null;
@@ -122,6 +123,7 @@ function (_, objTools, xsd, NodeValidator, XmlValidationResult, XmlValidationErr
 		 * @returns {Element|null}
 		 * @protected
 		 */
+		//SHOULD BE MOVED TO XSD LIBRARY OR REFACTORED
 		getNextElement: function (childCurrent) {
 			var next = childCurrent.nextElementSibling;
 			//if there are no more elements, let's get to possible extended defs

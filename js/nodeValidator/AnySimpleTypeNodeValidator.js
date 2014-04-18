@@ -22,15 +22,13 @@ function (_, objTools, xsd, NodeValidator, XmlValidationResult, XmlValidationErr
 		 * @returns {XmlValidationResult}
 		 */
 		validate: function () {
-			var type = xsd.getTypeFromNodeAttr(this.node, 'type', xsd.xsi);
-			var xsdNode = this.xsdLibrary.findTypeDefinition(type.namespaceURI, type.name);
-			if (xsdNode.namespaceURI === xsd.xs && xsdNode.localName === 'complexType') {
+			var type = this.xsdLibrary.findTypeDefinitionFromNodeAttr(this.node, 'type', xsd.xsi);
+			if (type.namespaceURI === xsd.xs && type.localName === 'complexType') {
 				return new XmlValidationResult([
 					new XmlValidationError(this.node, this.definition, 'simpleType')
 				]);
 			}
-			//NEEDS TO BE REWRITTEN!!!
-			var validator = this.validatorFactory.getValidator(typeDef, this.node, type);
+			var validator = this.validatorFactory.getValidator(this.definition, this.node, type);
 			return validator.validate();
 		}
 	});

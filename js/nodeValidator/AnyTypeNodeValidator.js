@@ -21,7 +21,7 @@ function (_, objTools, xsd, NodeValidator, XmlValidationResult, XmlValidationErr
 		 * @returns {XmlValidationResult}
 		 */
 		validate: function () {
-			var type = xsd.getTypeFromNodeAttr(this.node, 'type', xsd.xsi);
+			var type = this.xsdLibrary.findTypeDefinitionFromNodeAttr(this.node, 'type', xsd.xsi);
 			var validator = this.validatorFactory.getValidator(typeDef, this.node, type);
 			return validator.validate();
 		}
