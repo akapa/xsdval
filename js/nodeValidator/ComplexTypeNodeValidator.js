@@ -17,11 +17,12 @@ function (_, objTools, xsd, NodeValidator, XmlValidationResult, XmlValidationErr
 	{
 		/**
 		 * Validates the XML node against the XSD node.
-		 * Handles xsi:nil (and nillable), calls [validateChild()]{@link ComplexTypeNodeValidator#validateChild} for every child and handles assertions.
+		 * Handles xsi:nil (and nillable), calls [validateWith()]{@link ComplexTypeNodeValidator#validateWith} for every child and handles assertions.
 		 * @returns {XmlValidationResult}
 		 */
 		validate: function () {
 			var res = new XmlValidationResult();
+			var xsdlib = this.xsdLibrary;
 
 			//check if the whole node is nil
 			if (this.node.getAttributeNS(xsd.xs, 'nil') === 'true') {
@@ -30,50 +31,47 @@ function (_, objTools, xsd, NodeValidator, XmlValidationResult, XmlValidationErr
 				}
 			}
 			else {
-                var type = this.xsdLibrary.findElementType(this.definition);
-				var xsdNow = this.getFirstElement(type);
-				do {
-					res.add(this.validateChild(xsdNow));
-					xsdNow = this.getNextElement(xsdNow);
-				} while (xsdNow);
+                var type = xsdlib.findElementType(this.definition);
 
-				//check assertions
-				var assert = type.getElementsByTagNameNS(xsd.xs, 'assert');
-				if (assert.length) {
+				_(xsdlib.getComplexTypeElements(type)).each(function (elem) {
+					res.add(this.validateWith(elem));
+				}, this);
+
+				_(xsdlib.getComplexTypeAsserts(type)).each(function (assert) {
 					res.add(this.validateAssert(assert));
-				}
+				}, this);
 			}
 			return res;
 		},
 		/**
 		 * Used to validate a child node of the complex type element.
 		 * Validates minOccurs/maxOccurs and calls child validators.
-		 * @param {Element} xsdNow - The XSD node for the child element. Will look for the element(s) in the XML based on the XSD element name.
+		 * @param {Element} elem - The XSD node for the child element. Will look for the element(s) in the XML based on the XSD element name.
 		 * @returns {Array.<XmlValidationError>}
 		 * @protected
 		 */
-		validateChild: function (xsdNow) {
+		validateWith: function (elem) {
 			var errors = [];
 
 			//collecting XML nodes that are to be validated by the current XSD node
-			var xmlNow = _(this.node.children).filter(function (elem) {
-				return elem.tagName === xsdNow.getAttribute('name');
+			var xmlNow = _(this.node.children).filter(function (child) {
+				return child.tagName === elem.getAttribute('name');
 			});
 
 			//minOccurs, maxOccurs check
-			var occurLimit = xsd.parseMinMaxOccurs(xsdNow);
+			var occurLimit = xsd.parseMinMaxOccurs(elem);
 			if (xmlNow.length > occurLimit.max) {
-				errors.push(new XmlValidationError(this.node, xsdNow, 'maxOccurs'));
+				errors.push(new XmlValidationError(this.node, elem, 'maxOccurs'));
 			}
 			if (xmlNow.length < occurLimit.min) {
-				errors.push(new XmlValidationError(this.node, xsdNow, 'minOccurs'));
+				errors.push(new XmlValidationError(this.node, elem, 'minOccurs'));
 			}
 
 			//calling the right validators for all nodes
 			if (xmlNow.length) {
-				errors = errors.concat(this.callChildValidators(xmlNow, xsdNow));
+				errors = errors.concat(this.callChildValidators(xmlNow, elem));
 			}
-			return errors;
+			return _(errors).compact();
 		},
 		/**
 		 * Used to validate the given node(s) based on the passed XSD node.
@@ -106,37 +104,6 @@ function (_, objTools, xsd, NodeValidator, XmlValidationResult, XmlValidationErr
 				}
 			});
 			return errors;
-		},
-		/**
-		 * Used for iteration on the XSD child elements. Will return the first element to be evaluated.
-		 * @returns {Element|null}
-		 * @protected
-		 */
-		//SHOULD BE MOVED TO XSD LIBRARY OR REFACTORED
-		getFirstElement: function (xsdNode) {
-			var elems = xsdNode.getElementsByTagNameNS(xsdNode.namespaceURI, 'element');
-			return elems.length ? elems[0] : null;
-		},
-		/**
-		 * Used for iteration on the XSD child elements. Will return the next element to be evaluated after the given element.
-		 * Handles "extension" based inheritance. Advances to the next level of inheritance when there are no elements left on the current level.
-		 * @returns {Element|null}
-		 * @protected
-		 */
-		//SHOULD BE MOVED TO XSD LIBRARY OR REFACTORED
-		getNextElement: function (childCurrent) {
-			var next = childCurrent.nextElementSibling;
-			//if there are no more elements, let's get to possible extended defs
-			if (next === null) {
-				//find closest extension parent
-				var extension = xsd.getClosestAncestor(childCurrent, xsd.xs, 'extension');
-				if (extension) {
-					var extendedType = this.xsdLibrary
-						.findTypeDefinitionFromNodeAttr(extension, 'base');
-					next = this.getFirstElement(extendedType);
-				}
-			}
-			return next;
 		},
 		/**
 		 * Used to run XPath-based assertions on the complex type element.

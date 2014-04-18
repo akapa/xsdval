@@ -8,6 +8,8 @@
     <user xsi:type="my:user">
       <id>11</id>
       <name>Gipsz Jakab</name>
+      <stuff>juzer</stuff>
+      <additional>luzer</additional>
     </user>
   </return>
   <return xsi:type="my:event">
@@ -17,5 +19,7 @@
     <time>1986-05-15T20:00:00.000Z</time>
     <type>income</type>
     <user xsi:nil="true"/>
+    <stuff>nesze</stuff>
+    <additional>valami</additional>
   </return>
 </my:getEventsInRangeResponse>

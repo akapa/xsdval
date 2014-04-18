@@ -30,12 +30,12 @@ define(['objTools', 'xml'], function (objTools, xml) {
 		xsi: 'http://www.w3.org/2001/XMLSchema-instance',
 		findElement: function (parent, name) {
 			if (parent instanceof Document) { //document
-				parent = parent.documentElement;
+				elems = parent.documentElement.children;
 			}
 			else { //complexType
-				parent = parent.getElementsByTagNameNS(this.xs, 'sequence')[0];
+				elems = this.getComplexTypeElements(parent);
 			}
-			return _(parent.children).find(function (child) {
+			return _(elems).find(function (child) {
 				return child.namespaceURI === xsd.xs
 					&& child.localName === 'element'
 					&& child.getAttribute('name') === name;
@@ -56,6 +56,30 @@ define(['objTools', 'xml'], function (objTools, xml) {
 			return _(elem.children).find(function (child) {
 				return child.localName === 'complexType' ||
 					child.localName === 'simpleType';
+			});
+		},
+		getComplexTypeContent: function (complexType) {
+			return _(complexType.children).find(function (child) {
+				return child.localName === 'complexContent' ||
+					child.localName === 'simpleContent';
+			}) || complexType;	
+		},
+		getComplexTypeElements: function (complexType) {
+			var root = this.getComplexTypeContent(complexType);
+			var ext = _(root.children).find(function (child) {
+				return child.localName === 'extension' ||
+					child.localName === 'restriction';
+			}) || root;
+			var seq = _(ext.children).find(function (child) {
+				return child.localName === 'sequence';
+			});
+			return _(seq.children).filter(function (child) {
+				return child.localName === 'element';
+			});
+		},
+		getComplexTypeAsserts: function (complexType) {
+			return _(complexType.children).filter(function (child) {
+				return child.localName === 'assert';
 			});
 		},
 		/**

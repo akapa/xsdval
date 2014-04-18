@@ -69,6 +69,15 @@ var XsdLibrary = function (objTools, Library, xsd, basetypesXsd) {
                         });
                     return element ? this.findTypeDefinitionFromNodeAttr(element, 'base') : null;
                 },
+                findExtendedType: function (node) {
+                	if (node.localName === 'complexType') {
+                		node = xsd.getComplexTypeContent(node);
+                	}
+                    var element = _(node.children).find(function (child) {
+                            return child.namespaceURI === xsd.xs && child.localName === 'extension';
+                        });
+                    return element ? this.findTypeDefinitionFromNodeAttr(element, 'base') : null;
+                },
                 findBaseTypeFor: function (node) {
                     var curr, base;
                     do {
@@ -109,8 +118,25 @@ var XsdLibrary = function (objTools, Library, xsd, basetypesXsd) {
 						currType = this.findRestrictedType(currType);
 					}
 					return facets;
-				}		
-
+				},
+				getComplexTypeElements: function (complexType) {
+					var elems = [];
+					var curr = complexType;
+					while (curr) {
+						elems = elems.concat(xsd.getComplexTypeElements(curr));
+						curr = this.findExtendedType(curr);
+					}
+					return elems;
+				},
+				getComplexTypeAsserts: function (complexType) {
+					var elems = [];
+					var curr = complexType;
+					while (curr) {
+						elems = elems.concat(xsd.getComplexTypeAsserts(curr));
+						curr = this.findExtendedType(curr);
+					}
+					return elems;
+				}
             });
         return objTools.makeConstructor(function XsdLibrary() {
         }, xsdLibrary);
